@@ -15,7 +15,7 @@ abstract class DisasterEventsDao{
     abstract fun getEvents(): LiveData<List<DisasterWithImagesAndNews>>
 
     @Query("SELECT * FROM disaster_event_table WHERE id = :eventId")
-    abstract fun getApodId(eventId: String) : LiveData<List<DisasterWithImagesAndNews>>
+    abstract fun getEventById(eventId: String) : LiveData<List<DisasterWithImagesAndNews>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract fun saveEvent(disasterEvent: DisasterEvent)
@@ -28,4 +28,10 @@ abstract class DisasterEventsDao{
 
     @Delete
     abstract fun deleteEvent(disasterEvent: DisasterEvent)
+
+    @Delete
+    abstract fun deleteImage(disasterImage: DisasterImage)
+
+    @Delete
+    abstract fun deleteNewsArticle(disasterNewsArticle: DisasterNews)
 }

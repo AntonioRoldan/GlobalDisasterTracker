@@ -14,7 +14,7 @@ data class BingNewsSearchResponse(
 	val totalEstimatedMatches: Int? = null,
 
 	@field:SerializedName("queryContext")
-	val queryContext: QueryContext? = null,
+	val queryContext: NewsQueryContext? = null,
 
 	@field:SerializedName("_type")
 	val type: String? = null,
@@ -23,14 +23,14 @@ data class BingNewsSearchResponse(
 	val sort: List<SortItem?>? = null,
 
 	@field:SerializedName("value")
-	val value: List<ValueItem?>? = null
+	val value: List<ValueNewsItem?>? = null
 ) : Parcelable
 
 @Parcelize
 data class Image(
 
 	@field:SerializedName("thumbnail")
-	val thumbnail: Thumbnail? = null
+	val thumbnail: NewsThumbnail? = null
 ) : Parcelable
 
 @Parcelize
@@ -41,7 +41,7 @@ data class MentionsItem(
 ) : Parcelable
 
 @Parcelize
-data class ValueItem(
+data class ValueNewsItem(
 
 	@field:SerializedName("datePublished")
 	val datePublished: String? = null,
@@ -111,14 +111,14 @@ data class AboutItem(
 ) : Parcelable
 
 @Parcelize
-data class Thumbnail(
+data class NewsThumbnail(
 
 	@field:SerializedName("contentUrl")
 	val contentUrl: String? = null
 ) : Parcelable
 
 @Parcelize
-data class QueryContext(
+data class NewsQueryContext(
 
 	@field:SerializedName("adultIntent")
 	val adultIntent: Boolean? = null,
