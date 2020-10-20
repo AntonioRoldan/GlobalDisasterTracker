@@ -11,27 +11,16 @@ import io.keepcoding.globaldisastertracker.domain.DisasterWithImagesAndNews
 @Dao
 abstract class DisasterEventsDao{
 
-    @Query("SELECT * FROM disaster_event_table ORDER BY datetime(date)")
-    abstract fun getEvents(): LiveData<List<DisasterWithImagesAndNews>>
+    @Query("SELECT * FROM disaster_event_table")
+    abstract fun getEvents(): List<DisasterWithImagesAndNews>
 
     @Query("SELECT * FROM disaster_event_table WHERE id = :eventId")
-    abstract fun getEventById(eventId: String) : LiveData<List<DisasterWithImagesAndNews>>
+    abstract fun getEventById(eventId: String) : DisasterWithImagesAndNews
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun saveEvent(disasterEvent: DisasterEvent)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun saveImage(image: DisasterImage)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun saveNewsArticle(article: DisasterNews)
+    abstract fun saveEvent(disasterEvent: DisasterWithImagesAndNews)
 
     @Delete
-    abstract fun deleteEvent(disasterEvent: DisasterEvent)
+    abstract fun deleteEvent(disasterEvent: DisasterWithImagesAndNews)
 
-    @Delete
-    abstract fun deleteImage(disasterImage: DisasterImage)
-
-    @Delete
-    abstract fun deleteNewsArticle(disasterNewsArticle: DisasterNews)
 }

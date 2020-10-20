@@ -8,6 +8,10 @@ import io.keepcoding.globaldisastertracker.R
 
 class DetailActivity : AppCompatActivity() {
 
+    private lateinit var viewModel: DetailViewModel
+
+    //private lateinit var eventsAdapter: EventsListAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
@@ -17,5 +21,16 @@ class DetailActivity : AppCompatActivity() {
             Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show()
         }
+    }
+
+    private fun setUpUI(){
+
+    }
+    private fun setUpObserver(){
+
+    }
+
+    private fun setUpViewModel(){
+
     }
 }
