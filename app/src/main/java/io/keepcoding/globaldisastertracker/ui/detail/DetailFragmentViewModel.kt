@@ -12,7 +12,7 @@ import io.keepcoding.globaldisastertracker.repository.remote.ApiHelper
 import io.keepcoding.globaldisastertracker.utils.Resource
 import kotlinx.coroutines.launch
 
-class DetailViewModel(private val context : Application, private val apiHelper: ApiHelper, private val localHelper: LocalHelper) : ViewModel() {
+class DetailFragmentViewModel(private val context : Application, private val apiHelper: ApiHelper, private val localHelper: LocalHelper) : ViewModel() {
 
     private val images = MutableLiveData<Resource<List<ImageItemViewModel?>>>()
     private val news = MutableLiveData<Resource<List<NewsItemViewModel?>>>()

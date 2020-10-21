@@ -6,8 +6,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.keepcoding.globaldisastertracker.domain.DisasterWithImagesAndNews
-import io.keepcoding.globaldisastertracker.domain.EventsItem
-import io.keepcoding.globaldisastertracker.repository.local.DisasterEventsRoomDatabase
 import io.keepcoding.globaldisastertracker.repository.local.LocalHelper
 import io.keepcoding.globaldisastertracker.repository.remote.ApiHelper
 import io.keepcoding.globaldisastertracker.utils.Resource

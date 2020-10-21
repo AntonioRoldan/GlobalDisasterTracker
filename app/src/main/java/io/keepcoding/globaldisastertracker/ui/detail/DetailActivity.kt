@@ -22,12 +22,12 @@ class DetailActivity : AppCompatActivity() {
         const val LOCAL = "LOCAL"
     }
 
-    private val viewModel: DetailViewModel by lazy {
+    private val viewModel: DetailFragmentViewModel by lazy {
         val factory = CustomViewModelFactory(application,
             ApiHelperImpl(RemoteDataManager().bingSearchApi, RemoteDataManager().eonetApi),
             LocalHelperImpl(DisasterEventsRoomDatabase.getInstance(applicationContext))
         )
-        ViewModelProvider(this, factory).get(DetailViewModel::class.java)
+        ViewModelProvider(this, factory).get(DetailFragmentViewModel::class.java)
     }
 
     private lateinit var eventsItem: EventsItem
