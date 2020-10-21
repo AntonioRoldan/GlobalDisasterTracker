@@ -12,12 +12,14 @@ import io.keepcoding.globaldisastertracker.repository.remote.RemoteDataManager
 import io.keepcoding.globaldisastertracker.ui.detail.DetailActivity
 import io.keepcoding.globaldisastertracker.utils.CustomViewModelFactory
 import io.keepcoding.globaldisastertracker.utils.REQUEST_CODE
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), CallbackItemClick {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        setSupportActionBar(findViewById(R.id.toolbar))
     }
 
 

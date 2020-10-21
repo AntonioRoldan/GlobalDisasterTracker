@@ -12,9 +12,12 @@ class DetailActivity : AppCompatActivity(), CallbackItemClick {
         const val TAG = "DetailActivity"
         const val LOCAL = "LOCAL"
         const val ARG_EVENT_ITEM = "EVENT_ITEM"
+        const val ARG_FROM_SERVER ="FROM_SERVER"
     }
 
-    private lateinit var eventItem: EventItemViewModel
+    private var eventItem: EventItemViewModel? = null
+
+    private var fromServer: Boolean = false
 
     //private lateinit var mainTabAdapter: MainTabAdapter
 
@@ -22,7 +25,9 @@ class DetailActivity : AppCompatActivity(), CallbackItemClick {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
         setSupportActionBar(findViewById(R.id.toolbar))
-        intent?.let { eventItem = it.getParcelableExtra(ARG_EVENT_ITEM)}
+        val bundle: Bundle = intent.getBundleExtra("bundle")
+        eventItem = bundle.getParcelable(ARG_EVENT_ITEM)
+        fromServer = bundle.getBoolean(ARG_FROM_SERVER)
 
     }
 
