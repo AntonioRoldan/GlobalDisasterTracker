@@ -21,9 +21,22 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
-        android:id="@+id/fragment_container"
+    <com.google.android.material.tabs.TabLayout
+        android:id="@+id/tabLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:minHeight="?actionBarSize"
+        app:tabGravity="fill"
+        app:tabIndicatorColor="@color/design_default_color_on_primary"
+        app:tabIndicatorHeight="4dp"
+        app:tabBackground="@color/colorPrimary"
+        app:tabMode="fixed">
+    </com.google.android.material.tabs.TabLayout>
+
+    <androidx.viewpager2.widget.ViewPager2
+        android:id="@+id/viewPager"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </androidx.viewpager2.widget.ViewPager2>
 
 </LinearLayout>

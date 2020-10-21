@@ -17,6 +17,7 @@ import io.keepcoding.globaldisastertracker.ui.main.EventItemViewModel
 import io.keepcoding.globaldisastertracker.utils.CustomViewModelFactory
 import io.keepcoding.globaldisastertracker.utils.Status
 import kotlinx.android.synthetic.main.activity_detail.*
+import kotlinx.android.synthetic.main.fragment_detail.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
