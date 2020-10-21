@@ -23,6 +23,7 @@ class DetailActivity : AppCompatActivity(), CallbackItemClick {
         setContentView(R.layout.activity_detail)
         setSupportActionBar(findViewById(R.id.toolbar))
         intent?.let { eventItem = it.getParcelableExtra(ARG_EVENT_ITEM)}
+
     }
 
     override fun onImageItemClick(imageUrl: String) {
