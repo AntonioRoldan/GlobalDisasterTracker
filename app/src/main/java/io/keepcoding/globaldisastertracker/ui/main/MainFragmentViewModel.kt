@@ -18,7 +18,7 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
 
     private val eventsApi = MutableLiveData<Resource<List<EventsItem?>>>()
     private val eventsLocal = MutableLiveData<Resource<List<DisasterWithImagesAndNews>>>()
-
+    private val events = MutableLiveData<Resource<List<EventItemViewModel?>>>()
     // Get events from server
 
     fun fetchApiEvents() {

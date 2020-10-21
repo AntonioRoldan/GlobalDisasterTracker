@@ -40,7 +40,6 @@ class RemoteDataManager {
             .build()
 
 
-
         eonetApi = retrofitEONET.create(EONETApi::class.java)
         bingSearchApi = retrofitSearch.create(BingSearchApi::class.java)
     }

@@ -2,12 +2,16 @@ package io.keepcoding.globaldisastertracker.ui.detail
 
 import android.os.Bundle
 import android.widget.Toast
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
 import io.keepcoding.globaldisastertracker.R
 import io.keepcoding.globaldisastertracker.domain.EventsItem
+import io.keepcoding.globaldisastertracker.repository.local.DisasterEventsRoomDatabase
+import io.keepcoding.globaldisastertracker.repository.local.LocalHelperImpl
+import io.keepcoding.globaldisastertracker.repository.remote.ApiHelperImpl
+import io.keepcoding.globaldisastertracker.repository.remote.RemoteDataManager
+import io.keepcoding.globaldisastertracker.utils.CustomViewModelFactory
 import io.keepcoding.globaldisastertracker.utils.Status
 import kotlinx.android.synthetic.main.activity_detail.*
 
@@ -15,10 +19,16 @@ class DetailActivity : AppCompatActivity() {
 
     companion object {
         const val TAG = "DetailActivity"
-        const val FROM_LOCAL = "LOCAL"
+        const val LOCAL = "LOCAL"
     }
 
-    private lateinit var viewModel: DetailViewModel
+    private val viewModel: DetailViewModel by lazy {
+        val factory = CustomViewModelFactory(application,
+            ApiHelperImpl(RemoteDataManager().bingSearchApi, RemoteDataManager().eonetApi),
+            LocalHelperImpl(DisasterEventsRoomDatabase.getInstance(applicationContext))
+        )
+        ViewModelProvider(this, factory).get(DetailViewModel::class.java)
+    }
 
     private lateinit var eventsItem: EventsItem
 
@@ -37,7 +47,6 @@ class DetailActivity : AppCompatActivity() {
         setContentView(R.layout.activity_detail)
         setSupportActionBar(findViewById(R.id.toolbar))
         setUpUI()
-        setUpViewModel()
         setUpObservers()
         setUpListeners()
     }
@@ -45,7 +54,7 @@ class DetailActivity : AppCompatActivity() {
     private fun setUpListeners(){
         fab.setOnClickListener { view ->
             intent?.let {intent ->
-                if(intent.getStringExtra("SERVER_OR_LOCAL") == FROM_LOCAL){
+                if(intent.getStringExtra("SERVER_OR_LOCAL") == LOCAL){
                     eventId?.let { eventId ->
                         viewModel.deleteEvent(eventId)
                     }
@@ -97,11 +106,8 @@ class DetailActivity : AppCompatActivity() {
     private fun setUpObservers(){
         intent?.let {
             eventId = it.getStringExtra("EVENT_ID")
-            observe(it.getStringExtra("SERVER_OR_LOCAL") == FROM_LOCAL)
+            observe(it.getStringExtra("SERVER_OR_LOCAL") == LOCAL)
         }
     }
 
-    private fun setUpViewModel(){
-
-    }
 }
