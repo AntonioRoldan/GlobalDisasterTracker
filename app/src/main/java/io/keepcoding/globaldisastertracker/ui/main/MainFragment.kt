@@ -1,5 +1,6 @@
 package io.keepcoding.globaldisastertracker.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,7 +14,9 @@ import io.keepcoding.globaldisastertracker.repository.local.DisasterEventsRoomDa
 import io.keepcoding.globaldisastertracker.repository.local.LocalHelperImpl
 import io.keepcoding.globaldisastertracker.repository.remote.ApiHelperImpl
 import io.keepcoding.globaldisastertracker.repository.remote.RemoteDataManager
+import io.keepcoding.globaldisastertracker.ui.detail.DetailActivity
 import io.keepcoding.globaldisastertracker.utils.CustomViewModelFactory
+import io.keepcoding.globaldisastertracker.utils.REQUEST_CODE
 import io.keepcoding.globaldisastertracker.utils.Status
 
 // TODO: Rename parameter arguments, choose names that match

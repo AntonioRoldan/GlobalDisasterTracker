@@ -9,7 +9,6 @@ import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import io.keepcoding.globaldisastertracker.R
-import io.keepcoding.globaldisastertracker.domain.EventsItem
 import io.keepcoding.globaldisastertracker.repository.local.DisasterEventsRoomDatabase
 import io.keepcoding.globaldisastertracker.repository.local.LocalHelperImpl
 import io.keepcoding.globaldisastertracker.repository.remote.ApiHelperImpl
@@ -65,7 +64,7 @@ class ListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_list, container, false)
+        return inflater.inflate(R.layout.fragment_detail, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -139,11 +138,13 @@ class ListFragment : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(fromServer: String, eventItem : EventItemViewModel) =
+        fun newInstance(fromServer: Boolean, eventItem : EventItemViewModel, isNewsFragment: Boolean) =
             ListFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_FROM_SERVER, fromServer)
+                    putBoolean(ARG_FROM_SERVER, fromServer)
+                    putBoolean(ARG_IS_NEWS_FRAGMENT, isNewsFragment)
                     putParcelable(ARG_EVENT_ITEM, eventItem)
+
                 }
             }
     }
