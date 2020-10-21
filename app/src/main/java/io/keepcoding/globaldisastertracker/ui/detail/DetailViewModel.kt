@@ -11,83 +11,101 @@ import io.keepcoding.globaldisastertracker.repository.local.LocalHelper
 import io.keepcoding.globaldisastertracker.repository.remote.ApiHelper
 import io.keepcoding.globaldisastertracker.utils.Resource
 import kotlinx.coroutines.launch
-import java.time.OffsetDateTime
 
 class DetailViewModel(private val context : Application, private val apiHelper: ApiHelper, private val localHelper: LocalHelper) : ViewModel() {
 
-    private val apiImages = MutableLiveData<Resource<List<ValueItem?>>>()
-    private val apiNews = MutableLiveData<Resource<List<ValueNewsItem?>>>()
-    private val localImages = MutableLiveData<Resource<List<DisasterImage?>>>()
-    private val localNews = MutableLiveData<Resource<List<DisasterNews?>>>()
-    private val toast = MutableLiveData<Resource<String>>()
+    private val images = MutableLiveData<Resource<List<ImageItemViewModel?>>>()
+    private val news = MutableLiveData<Resource<List<NewsItemViewModel?>>>()
+    private val toast = MutableLiveData<Resource<String?>>()
     // If the user wants to fetch an event from the server
 
     fun fetchApiImages(query: String) {
         viewModelScope.launch {
-            apiImages.postValue(Resource.loading(null))
+            images.postValue(Resource.loading(null))
             try{
                 val imagesFromApi = apiHelper.getImages(query)
-                apiImages.postValue(Resource.success(imagesFromApi.value))
+                val imageViewModels: List<ImageItemViewModel?>? = imagesFromApi.value?.map {
+                    it?.let {
+                        ImageItemViewModel(image = it.contentUrl)
+                    }
+                }
+                images.postValue(Resource.success(imageViewModels))
             } catch(e: Exception){
-                apiImages.postValue(Resource.error(e.localizedMessage, null))
+                images.postValue(Resource.error(e.localizedMessage, null))
             }
         }
     }
 
     fun fetchApiNews(query: String) {
         viewModelScope.launch {
-            apiNews.postValue(Resource.loading(null))
+            news.postValue(Resource.loading(null))
             try {
                 val newsFromApi = apiHelper.getNews(query)
-                apiNews.postValue(Resource.success(newsFromApi.value))
+                val newsViewModels: List<NewsItemViewModel?>? = newsFromApi.value?.map {
+                    it?.let {
+                        NewsItemViewModel(
+                            title = it.name,
+                            thumbnail = it.image?.thumbnail?.contentUrl,
+                            description = it.description,
+                            newsUrl = it.url
+                        )
+                    }
+                }
+                news.postValue(Resource.success(newsViewModels))
             } catch (e: Exception){
-                apiNews.postValue(Resource.error(e.localizedMessage, null))
+                news.postValue(Resource.error(e.localizedMessage, null))
             }
         }
     }
 
-    fun getApiNews(): LiveData<Resource<List<ValueNewsItem?>>> {
-        return apiNews
+    fun getNews(): LiveData<Resource<List<NewsItemViewModel?>>> {
+        return news
     }
 
-    fun getApiImages(): LiveData<Resource<List<ValueItem?>>> {
-        return apiImages
+    fun getImages(): LiveData<Resource<List<ImageItemViewModel?>>> {
+        return images
     }
 
     //If the user is requesting a stored event from local
 
     fun loadNewsFromLocal(id: String) {
         viewModelScope.launch {
-            localNews.postValue(Resource.loading(null))
+            news.postValue(Resource.loading(null))
             try{
                 val event = localHelper.getEventById(id)
-                val news = event.news
-                localNews.postValue(Resource.success(news))
+                val localNews = event.news
+                val newsViewModels: List<NewsItemViewModel?>? = localNews?.map {
+                    it?.let {
+                        NewsItemViewModel(title = it.title, thumbnail = it.thumbnail, description = it.description, newsUrl = it.url)
+                    }
+                }
+                news.postValue(Resource.success(newsViewModels))
             } catch (e: Exception){
-                localNews.postValue(Resource.error(e.localizedMessage, null))
+                news.postValue(Resource.error(e.localizedMessage, null))
             }
         }
     }
 
     fun loadImagesFromLocal(id: String) {
         viewModelScope.launch {
-            localImages.postValue(Resource.loading(null))
+            images.postValue(Resource.loading(null))
             try{
                 val event = localHelper.getEventById(id)
-                val images = event.images
-                localImages.postValue(Resource.success(images))
+                val localImages = event.images
+                val imageViewModels: List<ImageItemViewModel?>? = localImages?.map {
+                    it?.let {
+                        ImageItemViewModel(image = it.url)
+                    }
+                }
+                images.postValue(Resource.success(imageViewModels))
             } catch (e: Exception){
-                localImages.postValue(Resource.error(e.localizedMessage, null))
+                images.postValue(Resource.error(e.localizedMessage, null))
             }
         }
     }
 
-    fun getLocalImages(): LiveData<Resource<List<DisasterImage?>>> {
-        return localImages
-    }
-
-    fun getLocalNews(): LiveData<Resource<List<DisasterNews?>>> {
-        return localNews
+    fun getSnackBar(): LiveData<Resource<String?>>{
+        return toast
     }
 
     fun deleteEvent(id: String){
@@ -95,11 +113,11 @@ class DetailViewModel(private val context : Application, private val apiHelper: 
             try{
                 val event = localHelper.getEventById(id)
                 localHelper.deleteEvent(event)
-                localImages.postValue(Resource.success(null))
-                localNews.postValue(Resource.success(null))
+                images.postValue(Resource.success(null))
+                news.postValue(Resource.success(null))
+                toast.postValue(Resource.success("Event deleted"))
             } catch (e: Exception){
-                localImages.postValue(Resource.error(e.localizedMessage, null))
-                localNews.postValue(Resource.error(e.localizedMessage, null))
+                toast.postValue(Resource.error(e.localizedMessage, "Error while deleting event, try again"))
             }
         }
     }
@@ -114,17 +132,19 @@ class DetailViewModel(private val context : Application, private val apiHelper: 
                     longitude = EONETDto.geometry?.get(0)?.coordinates?.get(1)
                     )
                 // Next we turn the api responses into room entities
-                val images = apiImages.value?.data?.map {
+                val imageEntities = images.value?.data?.map {
                     it?.let {
-                        it.thumbnailUrl?.let { url -> DisasterImage(url = url) }
+                        it.image?.let {url ->
+                            DisasterImage(url=url)
+                        }
                     }
                 }
-                val news = apiNews.value?.data?.map {
+                val newsEntities = news.value?.data?.map {
                     it?.let{newsItem ->
-                        newsItem.name?.let {name ->
-                            newsItem.url?.let {url ->
+                        newsItem.title?.let {name ->
+                            newsItem.newsUrl.let {url ->
                                 newsItem.description?.let{description ->
-                                    newsItem.image?.thumbnail?.contentUrl?.let {contentUrl ->
+                                    newsItem.thumbnail?.let {contentUrl ->
                                         DisasterNews(title = name, url = url, description = description, thumbnail = contentUrl)
                                     }
                                 }
@@ -132,12 +152,11 @@ class DetailViewModel(private val context : Application, private val apiHelper: 
                         }
                     }
                 }
-                val eventWithRelations = DisasterWithImagesAndNews(event, images, news)
+                val eventWithRelations = DisasterWithImagesAndNews(event, imageEntities, newsEntities)
                 localHelper.saveEvent(eventWithRelations)
                 toast.postValue(Resource.success("Event saved"))
             } catch (e: Exception){
-                apiImages.postValue(Resource.error(e.localizedMessage, null))
-                apiNews.postValue(Resource.error(e.localizedMessage, null))
+                toast.postValue(Resource.error(e.localizedMessage, "Could not save disaster, try again"))
             }
         }
     }

@@ -22,5 +22,4 @@ abstract class DisasterEventsDao{
 
     @Delete
     abstract fun deleteEvent(disasterEvent: DisasterWithImagesAndNews)
-
 }
