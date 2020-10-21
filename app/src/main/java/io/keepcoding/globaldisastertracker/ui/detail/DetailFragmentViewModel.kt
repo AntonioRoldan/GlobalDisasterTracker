@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import io.keepcoding.globaldisastertracker.domain.*
 import io.keepcoding.globaldisastertracker.repository.local.LocalHelper
 import io.keepcoding.globaldisastertracker.repository.remote.ApiHelper
+import io.keepcoding.globaldisastertracker.ui.main.EventItemViewModel
 import io.keepcoding.globaldisastertracker.utils.Resource
 import kotlinx.coroutines.launch
 
@@ -122,14 +123,11 @@ class DetailFragmentViewModel(private val context : Application, private val api
         }
     }
 
-    fun saveEvent(EONETDto: EventsItem){
+    fun saveEvent(eventViewModel: EventItemViewModel){
         viewModelScope.launch{
             try{
-                val event = DisasterEvent(title = EONETDto.title,
-                    description = EONETDto.description as String?,
-                    category = EONETDto.categories?.get(0)?.title,
-                    latitude = EONETDto.geometry?.get(0)?.coordinates?.get(0),
-                    longitude = EONETDto.geometry?.get(0)?.coordinates?.get(1)
+                val event = DisasterEvent(title = eventViewModel.title,
+                    description = eventViewModel.description as String?
                     )
                 // Next we turn the api responses into room entities
                 val imageEntities = images.value?.data?.map {

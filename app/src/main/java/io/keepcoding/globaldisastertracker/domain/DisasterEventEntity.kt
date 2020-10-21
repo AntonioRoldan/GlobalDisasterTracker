@@ -9,9 +9,5 @@ import java.util.*
 data class DisasterEvent(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     val title: String?,
-    val description: String?,
-    val category: String?,
-    val date: OffsetDateTime? = null,
-    val latitude: Double? = null,
-    val longitude: Double? = null
+    val description: String?
 )

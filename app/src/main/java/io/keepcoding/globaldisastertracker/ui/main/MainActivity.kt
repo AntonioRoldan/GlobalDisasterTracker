@@ -12,18 +12,9 @@ import io.keepcoding.globaldisastertracker.utils.CustomViewModelFactory
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var events: List<EventItemViewModel?>
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
     }
 
-    private fun setUpUI(){
-
-    }
-
-    private fun setUpObservers(){
-
-    }
 }

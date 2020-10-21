@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import io.keepcoding.globaldisastertracker.R
 import io.keepcoding.globaldisastertracker.repository.local.DisasterEventsRoomDatabase
@@ -12,11 +14,11 @@ import io.keepcoding.globaldisastertracker.repository.local.LocalHelperImpl
 import io.keepcoding.globaldisastertracker.repository.remote.ApiHelperImpl
 import io.keepcoding.globaldisastertracker.repository.remote.RemoteDataManager
 import io.keepcoding.globaldisastertracker.utils.CustomViewModelFactory
+import io.keepcoding.globaldisastertracker.utils.Status
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+private const val ARG_FROM_SERVER = "FROM_SERVER"
 
 /**
  * A simple [Fragment] subclass.
@@ -25,8 +27,11 @@ private const val ARG_PARAM2 = "param2"
  */
 class MainFragment : Fragment() {
     // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
+    private var fromServer: Boolean = false
+
+    private var events: List<EventItemViewModel?>? = mutableListOf(null)
+
+    private var loading: Boolean = false
 
     private val viewModel: MainFragmentViewModel by lazy {
         val factory = CustomViewModelFactory(requireActivity().application,
@@ -39,8 +44,7 @@ class MainFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
+            fromServer = it.getBoolean(ARG_FROM_SERVER)
         }
     }
 
@@ -50,6 +54,26 @@ class MainFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_main, container, false)
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setUpObservers()
+    }
+
+    private fun setUpObservers(){
+        if(fromServer){
+            viewModel.fetchApiEvents()
+        } else{
+            viewModel.fetchLocalEvents()
+        }
+        viewModel.getEvents().observe(viewLifecycleOwner, Observer {
+            when(it.status){
+                Status.SUCCESS -> events = it.data
+                Status.LOADING -> loading = true
+                Status.ERROR -> Toast.makeText(requireActivity().application, it.message, Toast.LENGTH_LONG)
+            }
+        })
     }
 
     companion object {
@@ -63,11 +87,10 @@ class MainFragment : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance(param1: String, param2: String) =
+        fun newInstance(fromServer: Boolean) =
             MainFragment().apply {
                 arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+                    putBoolean(ARG_FROM_SERVER, fromServer)
                 }
             }
     }
