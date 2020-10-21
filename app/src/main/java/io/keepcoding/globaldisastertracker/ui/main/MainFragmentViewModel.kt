@@ -16,46 +16,50 @@ import java.lang.Exception
 
 class MainFragmentViewModel(private val context: Application, private val apiHelper: ApiHelper, private val localHelper: LocalHelper) : ViewModel(){
 
-    private val eventsApi = MutableLiveData<Resource<List<EventsItem?>>>()
     private val eventsLocal = MutableLiveData<Resource<List<DisasterWithImagesAndNews>>>()
     private val events = MutableLiveData<Resource<List<EventItemViewModel?>>>()
     // Get events from server
 
     fun fetchApiEvents() {
         viewModelScope.launch {
-            eventsApi.postValue(Resource.loading(null))
+            events.postValue(Resource.loading(null))
             try{
                 val eventsFromApi = apiHelper.getEvents()
-                if(eventsFromApi.events != null)
-                    eventsApi.postValue(Resource.success(eventsFromApi.events))
+                if(eventsFromApi.events != null) {
+                    val eventsViewModels: List<EventItemViewModel?>? = eventsFromApi.events?.map {
+                        it?.let {eventDto ->
+                            EventItemViewModel(id = null, title = eventDto.title, description = eventDto.description as String?)
+                        }
+                    }
+                    events.postValue(Resource.success(eventsViewModels))
+                }
             } catch (e: Exception){
-                eventsApi.postValue(Resource.error(e.localizedMessage, null))
+                events.postValue(Resource.error(e.localizedMessage, null))
             }
         }
-    }
-
-    fun getApiEvents(): LiveData<Resource<List<EventsItem?>>>{
-        return eventsApi
     }
 
     // Get events from local
 
     fun fetchLocalEvents(){
         viewModelScope.launch {
-            eventsLocal.postValue(Resource.loading(null))
+            events.postValue(Resource.loading(null))
             try {
                 val eventsFromLocal = localHelper.getEvents()
-                if(eventsFromLocal != null){
-                    eventsLocal.postValue(Resource.success(eventsFromLocal))
+                val eventsViewModels: List<EventItemViewModel?> = eventsFromLocal.map {
+                    EventItemViewModel(id = it.DisasterEventEntity.id,
+                        title = it.DisasterEventEntity.title,
+                        description = it.DisasterEventEntity.description)
                 }
+                events.postValue(Resource.success(eventsViewModels))
             } catch (e: Exception){
-                eventsLocal.postValue(Resource.error(e.localizedMessage, null))
+                events.postValue(Resource.error(e.localizedMessage, null))
             }
         }
     }
 
-    fun getLocalEvents(): LiveData<Resource<List<DisasterWithImagesAndNews>>> {
-        return eventsLocal
+    // Return observable
+    fun getEvents(): LiveData<Resource<List<EventItemViewModel?>>>{
+        return events
     }
-
 }
