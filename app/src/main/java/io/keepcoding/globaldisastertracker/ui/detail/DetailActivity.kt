@@ -2,6 +2,7 @@ package io.keepcoding.globaldisastertracker.ui.detail
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentActivity
 import io.keepcoding.globaldisastertracker.R
 import io.keepcoding.globaldisastertracker.ui.main.EventItemViewModel
 
