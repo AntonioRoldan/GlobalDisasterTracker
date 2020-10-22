@@ -14,14 +14,14 @@ class ViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activi
     }
 
     override fun createFragment(position: Int): Fragment {
-        when(position){
+        return when(position){
             0 -> {
                 eonetFragment = MainFragment.newInstance(true)
-                return eonetFragment
+                eonetFragment
             }
             else -> {
                 localFragment = MainFragment.newInstance(false)
-                return localFragment
+                localFragment
             }
         }
     }

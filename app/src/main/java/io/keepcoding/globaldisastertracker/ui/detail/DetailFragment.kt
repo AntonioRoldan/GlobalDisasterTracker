@@ -31,7 +31,7 @@ private const val ARG_IS_NEWS_FRAGMENT ="IS_NEWS_FRAGMENT"
  * Use the [ListFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class ListFragment : Fragment() {
+class DetailFragment : Fragment() {
     // Fragment parameters
     private var fromServer: Boolean = false
     private var eventItem: EventItemViewModel? = null
@@ -140,7 +140,7 @@ class ListFragment : Fragment() {
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(fromServer: Boolean, eventItem : EventItemViewModel, isNewsFragment: Boolean) =
-            ListFragment().apply {
+            DetailFragment().apply {
                 arguments = Bundle().apply {
                     putBoolean(ARG_FROM_SERVER, fromServer)
                     putBoolean(ARG_IS_NEWS_FRAGMENT, isNewsFragment)
