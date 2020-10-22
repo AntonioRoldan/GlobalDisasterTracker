@@ -15,7 +15,6 @@ class MainActivity : AppCompatActivity(), MainInteractionListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        setSupportActionBar(findViewById(R.id.toolbar))
         viewPagerAdapter = ViewPagerAdapter(this)
         viewPager.adapter = viewPagerAdapter
         TabLayoutMediator(tabLayout, viewPager) {tab, position ->

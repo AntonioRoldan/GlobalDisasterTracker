@@ -30,12 +30,12 @@ class RemoteDataManager {
         val retrofitEONET = Retrofit.Builder()
             //.client(client)
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://eonet.sci.gsfc.nasa.gov/api/v3")
+            .baseUrl("https://eonet.sci.gsfc.nasa.gov/api/v3/")
             .build()
 
         val retrofitSearch = Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create())
-            .baseUrl("https://api.cognitive.microsoft.com/bing/v7.0")
+            .baseUrl("https://api.cognitive.microsoft.com/bing/v7.0/")
             .build()
 
 
