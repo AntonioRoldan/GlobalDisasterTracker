@@ -1,3 +1,5 @@
 package io.keepcoding.globaldisastertracker.ui.detail
 
-data class ImageItemViewModel(val image: String?)
+import androidx.recyclerview.widget.RecyclerView
+
+data class ImageItemViewModel(val viewType: Int = DetailAdapter.IMAGE, val image: String?)
