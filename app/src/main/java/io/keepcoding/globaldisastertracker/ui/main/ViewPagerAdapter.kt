@@ -6,8 +6,8 @@ import androidx.viewpager2.adapter.FragmentStateAdapter
 
 class ViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity) {
 
-    private lateinit var eonetFragment: Fragment
-    lateinit var localFragment: Fragment // We make this public so we can call notify listeners from main activity
+    private lateinit var eonetFragment: MainFragment
+    lateinit var localFragment: MainFragment // We make this public so we can call notify listeners from main activity
 
     override fun getItemCount(): Int {
         return 2

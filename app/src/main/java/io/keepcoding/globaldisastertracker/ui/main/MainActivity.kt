@@ -28,7 +28,7 @@ class MainActivity : AppCompatActivity(), MainInteractionListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_CODE){
-            //viewPagerAdapter?.localFragment? we call notifyDataSetChanged from here
+            viewPagerAdapter?.localFragment?.updateList()
         }
     }
 
