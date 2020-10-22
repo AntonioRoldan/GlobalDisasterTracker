@@ -3,30 +3,33 @@ package io.keepcoding.globaldisastertracker.ui.main
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.tabs.TabLayoutMediator
 import io.keepcoding.globaldisastertracker.R
-import io.keepcoding.globaldisastertracker.repository.local.DisasterEventsRoomDatabase
-import io.keepcoding.globaldisastertracker.repository.local.LocalHelperImpl
-import io.keepcoding.globaldisastertracker.repository.remote.ApiHelperImpl
-import io.keepcoding.globaldisastertracker.repository.remote.RemoteDataManager
 import io.keepcoding.globaldisastertracker.ui.detail.DetailActivity
-import io.keepcoding.globaldisastertracker.utils.CustomViewModelFactory
 import io.keepcoding.globaldisastertracker.utils.REQUEST_CODE
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), CallbackItemClick {
+class MainActivity : AppCompatActivity(), MainInteractionListener {
 
+    private var viewPagerAdapter: ViewPagerAdapter? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setSupportActionBar(findViewById(R.id.toolbar))
+        viewPagerAdapter = ViewPagerAdapter(this)
+        viewPager.adapter = viewPagerAdapter
+        TabLayoutMediator(tabLayout, viewPager) {tab, position ->
+            when(position){
+                0 -> tab.text = "EONET"
+                1 -> tab.text = "Local"
+            }
+        }.attach()
     }
-
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_CODE){
-
+            //viewPagerAdapter?.localFragment? we call notifyDataSetChanged from here
         }
     }
 
@@ -49,5 +52,7 @@ class MainActivity : AppCompatActivity(), CallbackItemClick {
         intent.putExtra("bundle", bundle)
         startActivityForResult(intent, REQUEST_CODE)
     }
+
+
 
 }

@@ -1,26 +1,29 @@
 package io.keepcoding.globaldisastertracker.ui.main
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.LinearLayoutManager
 import io.keepcoding.globaldisastertracker.R
 import io.keepcoding.globaldisastertracker.repository.local.DisasterEventsRoomDatabase
 import io.keepcoding.globaldisastertracker.repository.local.LocalHelperImpl
 import io.keepcoding.globaldisastertracker.repository.remote.ApiHelperImpl
 import io.keepcoding.globaldisastertracker.repository.remote.RemoteDataManager
-import io.keepcoding.globaldisastertracker.ui.detail.DetailActivity
 import io.keepcoding.globaldisastertracker.utils.CustomViewModelFactory
-import io.keepcoding.globaldisastertracker.utils.REQUEST_CODE
 import io.keepcoding.globaldisastertracker.utils.Status
+import kotlinx.android.synthetic.main.fragment_main.*
+import kotlin.IllegalArgumentException
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_FROM_SERVER = "FROM_SERVER"
 
 /**
@@ -34,7 +37,25 @@ class MainFragment : Fragment() {
 
     private var events: List<EventItemViewModel?>? = mutableListOf(null)
 
-    private var loading: Boolean = false
+    private var mainInteractionListener: MainInteractionListener? = null // We will pass this to the recycler view adapter
+
+    private val eventsAdapter: EventsAdapter by lazy {
+        lateinit var adapter: EventsAdapter
+        if(fromServer){
+            context?.let { context ->
+                adapter = EventsAdapter(context) {
+                    mainInteractionListener?.onItemClickFromServer(it)
+                }
+            }
+        } else {
+            context?.let { context ->
+                adapter = EventsAdapter(context) {
+                    mainInteractionListener?.onItemClickFromLocal(it)
+                }
+            }
+        }
+        adapter
+    }
 
     private val viewModel: MainFragmentViewModel by lazy {
         val factory = CustomViewModelFactory(requireActivity().application,
@@ -42,6 +63,15 @@ class MainFragment : Fragment() {
             LocalHelperImpl(DisasterEventsRoomDatabase.getInstance(requireActivity().applicationContext))
         )
         ViewModelProvider(this, factory).get(MainFragmentViewModel::class.java)
+    }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        if(context is MainInteractionListener){
+            mainInteractionListener = context
+        } else {
+            throw IllegalArgumentException("Context does not implement interface ${MainInteractionListener::class.java.canonicalName}")
+        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +91,15 @@ class MainFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setUpUI()
         setUpObservers()
+    }
+
+    private fun setUpUI(){
+        eventsAdapter.eventItems = events
+        list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        list.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        list.adapter = eventsAdapter
     }
 
     private fun setUpObservers(){
@@ -73,7 +111,7 @@ class MainFragment : Fragment() {
         viewModel.getEvents().observe(viewLifecycleOwner, Observer {
             when(it.status){
                 Status.SUCCESS -> events = it.data
-                Status.LOADING -> loading = true
+                Status.LOADING -> {} // We make recycler view invisible and spinning wheel visible
                 Status.ERROR -> Toast.makeText(requireActivity().application, it.message, Toast.LENGTH_LONG)
             }
         })

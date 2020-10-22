@@ -1,6 +1,6 @@
 package io.keepcoding.globaldisastertracker.ui.main
 
-interface CallbackItemClick {
+interface MainInteractionListener {
     fun onItemClickFromServer(eventItemViewModel: EventItemViewModel)
     fun onItemClickFromLocal(eventItemViewModel: EventItemViewModel)
 }
