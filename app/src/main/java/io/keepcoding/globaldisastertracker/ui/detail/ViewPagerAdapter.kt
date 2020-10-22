@@ -7,7 +7,7 @@ import io.keepcoding.globaldisastertracker.ui.main.EventItemViewModel
 
 class ViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activity){
 
-    private var fromServer: Boolean = false
+    private var fromServer: Boolean? = false
 
     private var eventItem: EventItemViewModel? = null
 
@@ -15,15 +15,15 @@ class ViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activi
         return 2
     }
 
-    fun setFragmentArguments(eventItem: EventItemViewModel, fromServer: Boolean){
+    fun setFragmentArguments(eventItem: EventItemViewModel?, fromServer: Boolean?){
         this.fromServer = fromServer
         this.eventItem = eventItem
     }
 
     override fun createFragment(position: Int): Fragment {
         return when(position){
-            0 -> DetailFragment.newInstance(eventItem = eventItem!!, fromServer = fromServer, isNewsFragment = true)
-            else -> DetailFragment.newInstance(eventItem = eventItem!!, fromServer = fromServer, isNewsFragment = false)
+            0 -> DetailFragment.newInstance(eventItem = eventItem!!, fromServer = fromServer!!, isNewsFragment = true)
+            else -> DetailFragment.newInstance(eventItem = eventItem!!, fromServer = fromServer!!, isNewsFragment = false)
         }
     }
 
