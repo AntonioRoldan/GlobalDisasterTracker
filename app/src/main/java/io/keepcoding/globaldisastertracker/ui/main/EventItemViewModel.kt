@@ -5,7 +5,7 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class EventItemViewModel(
-    val id: String?,
+    var id: String? = null,
     val title: String?,
     val description: String?
 ) : Parcelable

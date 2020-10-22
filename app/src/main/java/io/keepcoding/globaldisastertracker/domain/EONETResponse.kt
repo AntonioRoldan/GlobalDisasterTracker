@@ -22,7 +22,7 @@ data class CategoriesItem(
 data class GeometryItem(
 	val date: String? = null,
 	val magnitudeValue: @RawValue Any? = null,
-	val coordinates: List<Double?>? = null,
+	val coordinates: @RawValue List<Any>? = null,
 	val type: String? = null,
 	val magnitudeUnit: @RawValue Any? = null
 ) : Parcelable

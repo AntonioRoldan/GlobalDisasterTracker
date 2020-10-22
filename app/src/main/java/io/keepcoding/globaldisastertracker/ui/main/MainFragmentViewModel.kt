@@ -29,6 +29,7 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
             try{
                 apiHelper.getEvents().enqueue(object : Callback<EONETResponse> {
                     override fun onFailure(call: Call<EONETResponse>, t: Throwable) {
+                        Log.v("API ERROR", t.localizedMessage)
                         events.postValue(Resource.error(t.localizedMessage, null))
                     }
 
@@ -39,9 +40,8 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
                         response.body()?.let {EONETResponse ->
                             val eventViewModels: List<EventItemViewModel?>? = EONETResponse?.events?.map {
                                 EventItemViewModel(
-                                    id = null,
                                     title = it?.title,
-                                    description = it?.description as String
+                                    description = it?.description as String?
                                 )
                             }
                             events.postValue(Resource.success(eventViewModels))

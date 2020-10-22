@@ -56,6 +56,7 @@ class MainFragment : Fragment() {
                 }
             }
         }
+        adapter.eventItems = events
         adapter
     }
 
@@ -107,10 +108,7 @@ class MainFragment : Fragment() {
     }
 
     private fun setUpUI(){
-        eventsAdapter.eventItems = events
         list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-        list.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
-        list.adapter = eventsAdapter
     }
 
     private fun fetchData(){
@@ -127,8 +125,10 @@ class MainFragment : Fragment() {
             when(it.status){
                 Status.SUCCESS -> {
                     events = it.data
+                    Log.v("EVENTS", "$events")
                     loadingView.visibility = View.INVISIBLE
                     list.visibility = View.VISIBLE
+                    list.adapter = eventsAdapter
                 }
                 Status.LOADING -> {
                     loadingView.visibility = View.VISIBLE
