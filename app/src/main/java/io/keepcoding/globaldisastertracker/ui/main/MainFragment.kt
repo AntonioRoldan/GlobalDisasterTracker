@@ -101,7 +101,7 @@ class MainFragment : Fragment() {
     private fun setUpListeners(){
         buttonRetry.setOnClickListener {
             retry.visibility = View.INVISIBLE
-            list.visibility = View.VISIBLE
+            loadingView.visibility = View.VISIBLE
             fetchData()
         }
     }
@@ -135,6 +135,7 @@ class MainFragment : Fragment() {
                     list.visibility = View.INVISIBLE
                 } // We make recycler view invisible and spinning wheel visible
                 Status.ERROR -> {
+                    loadingView.visibility = View.INVISIBLE
                     retry.visibility = View.VISIBLE
                     list.visibility = View.INVISIBLE
                     Toast.makeText(requireActivity().application, it.message, Toast.LENGTH_LONG)

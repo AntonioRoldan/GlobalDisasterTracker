@@ -12,6 +12,9 @@ import io.keepcoding.globaldisastertracker.repository.remote.ApiHelper
 import io.keepcoding.globaldisastertracker.ui.main.EventItemViewModel
 import io.keepcoding.globaldisastertracker.utils.Resource
 import kotlinx.coroutines.launch
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 import java.util.*
 
 class DetailFragmentViewModel(private val context : Application, private val apiHelper: ApiHelper, private val localHelper: LocalHelper) : ViewModel() {
@@ -25,13 +28,26 @@ class DetailFragmentViewModel(private val context : Application, private val api
         viewModelScope.launch {
             images.postValue(Resource.loading(null))
             try{
-                val imagesFromApi = apiHelper.getImages(query)
-                val imageViewModels: List<ImageItemViewModel?>? = imagesFromApi.value?.map {
-                    it?.let {
-                        ImageItemViewModel(image = it.contentUrl)
+                apiHelper.getImages(query).enqueue(object :
+                    Callback<BingImageSearchResponse> {
+
+                    override fun onFailure(call: Call<BingImageSearchResponse>, t: Throwable) {
+                        images.postValue(Resource.error(t.localizedMessage, null))
                     }
-                }
-                images.postValue(Resource.success(imageViewModels))
+
+                    override fun onResponse(
+                        call: Call<BingImageSearchResponse>,
+                        response: Response<BingImageSearchResponse>
+                    ) {
+                        response.body()?.let {
+                            val imageViewModels: List<ImageItemViewModel?>? = it.value?.map { imageApi ->
+                                ImageItemViewModel(image = imageApi?.contentUrl)
+                            }
+                            images.postValue(Resource.success(imageViewModels))
+                        }
+                    }
+
+                })
             } catch(e: Exception){
                 images.postValue(Resource.error(e.localizedMessage, null))
             }
@@ -42,18 +58,29 @@ class DetailFragmentViewModel(private val context : Application, private val api
         viewModelScope.launch {
             news.postValue(Resource.loading(null))
             try {
-                val newsFromApi = apiHelper.getNews(query)
-                val newsViewModels: List<NewsItemViewModel?>? = newsFromApi.value?.map {
-                    it?.let {
-                        NewsItemViewModel(
-                            title = it.name,
-                            thumbnail = it.image?.thumbnail?.contentUrl,
-                            description = it.description,
-                            newsUrl = it.url
-                        )
+                apiHelper.getNews(query).enqueue(object : Callback<BingNewsSearchResponse> {
+
+                    override fun onFailure(call: Call<BingNewsSearchResponse>, t: Throwable) {
+                        news.postValue(Resource.error(t.localizedMessage, null))
                     }
-                }
-                news.postValue(Resource.success(newsViewModels))
+
+                    override fun onResponse(
+                        call: Call<BingNewsSearchResponse>,
+                        response: Response<BingNewsSearchResponse>
+                    ) {
+                        response.body()?.let {
+                            val newsItemViewModels: List<NewsItemViewModel?>? = it.value?.map { articleApi ->
+                                NewsItemViewModel(title = articleApi?.name,
+                                    description = articleApi?.description,
+                                    newsUrl = articleApi?.url,
+                                    thumbnail = articleApi?.image?.thumbnail?.contentUrl
+                                )
+                            }
+                            news.postValue(Resource.success(newsItemViewModels))
+                        }
+                    }
+
+                })
             } catch (e: Exception){
                 news.postValue(Resource.error(e.localizedMessage, null))
             }

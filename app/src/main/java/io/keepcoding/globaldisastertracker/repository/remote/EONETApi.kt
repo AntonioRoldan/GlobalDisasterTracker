@@ -7,8 +7,8 @@ import retrofit2.http.Query
 
 interface EONETApi {
 
-    @GET("/events")  // planetary/apod?api_key=DEMO_KEY
+    @GET("events")  // planetary/apod?api_key=DEMO_KEY
     @Headers("Content-Type: application/json")
-    fun getEvents(@Query("api_key") apiKey: String): EONETResponse
+    fun getEvents(@Query("api_key") apiKey: String): Call<EONETResponse>
     
 }
