@@ -2,8 +2,8 @@
 package io.keepcoding.globaldisastertracker.domain
 
 import androidx.room.Embedded
+import androidx.room.Entity
 import androidx.room.Relation
-
 data class DisasterWithImagesAndNews(
     // We define two one to many relations: one between events and images, and the other between events and news articles
     @Embedded val DisasterEventEntity: DisasterEvent,

@@ -7,12 +7,12 @@ import io.keepcoding.globaldisastertracker.domain.DisasterWithImagesAndNews
 
 interface LocalHelper {
 
-    suspend fun getEventById(id: String): DisasterWithImagesAndNews
+    suspend fun getEventById(id: String): DisasterEvent
 
-    suspend fun getEvents(): List<DisasterWithImagesAndNews>
+    suspend fun getEvents(): List<DisasterEvent>
 
-    suspend fun saveEvent(disasterEvent: DisasterWithImagesAndNews)
+    suspend fun saveEvent(event: DisasterEvent)
 
-    suspend fun deleteEvent(disasterEvent: DisasterWithImagesAndNews)
+    suspend fun deleteEvent(event: DisasterEvent)
 
 }

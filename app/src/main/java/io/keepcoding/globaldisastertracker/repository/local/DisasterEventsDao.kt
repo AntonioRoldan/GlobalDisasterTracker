@@ -12,14 +12,65 @@ import io.keepcoding.globaldisastertracker.domain.DisasterWithImagesAndNews
 abstract class DisasterEventsDao{
 
     @Query("SELECT * FROM disaster_event_table")
-    abstract fun getEvents(): List<DisasterWithImagesAndNews>
+    abstract fun getEvents(): List<DisasterEvent>
+
+    @Query("SELECT * FROM disaster_image_table WHERE eventId = :eventId")
+    abstract fun getEventImages(eventId: String) : List<DisasterImage>
+
+    @Query("SELECT * FROM disaster_news_table WHERE eventId = :eventId")
+    abstract fun getEventNews(eventId: String) : List<DisasterNews>
 
     @Query("SELECT * FROM disaster_event_table WHERE id = :eventId")
-    abstract fun getEventById(eventId: String) : DisasterWithImagesAndNews
+    abstract fun getEvent(eventId: String): DisasterEvent
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun saveEvent(disasterEvent: DisasterWithImagesAndNews)
+    abstract fun insertEvent(event: DisasterEvent)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertNewsList(news: List<DisasterNews>)
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    abstract fun insertImagesList(images: List<DisasterImage>)
 
     @Delete
-    abstract fun deleteEvent(disasterEvent: DisasterWithImagesAndNews)
+    abstract fun deleteEvent(event: DisasterEvent)
+
+    @Delete
+    abstract fun deleteImage(image: DisasterImage)
+
+    @Delete
+    abstract fun deleteNews(news: DisasterNews)
+
+    fun insertEventWithImagesAndNews(event: DisasterEvent){
+        var images: List<DisasterImage> = event.images
+        var news: List<DisasterNews> = event.news
+        for(image in images){
+            image.eventId = event.id
+        }
+        for(article in news){
+            article.eventId = event.id
+        }
+        insertImagesList(images)
+        insertNewsList(news)
+        insertEvent(event)
+    }
+
+    fun getEventWithImagesAndNews(id: String): DisasterEvent{
+        var event: DisasterEvent = getEvent(id)
+        val images: List<DisasterImage> = getEventImages(id)
+        val news: List<DisasterNews> = getEventNews(id)
+        event.images = images
+        event.news = news
+        return event
+    }
+
+    fun deleteEventWithImagesAndNews(event: DisasterEvent){
+        for(image in event.images){
+            deleteImage(image)
+        }
+        for(article in event.news){
+            deleteNews(article)
+        }
+        deleteEvent(event)
+    }
 }

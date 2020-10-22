@@ -1,4 +1,4 @@
-
+package io.keepcoding.globaldisastertracker.repository.remote
 import io.keepcoding.globaldisastertracker.domain.EONETResponse
 import retrofit2.Call
 import retrofit2.http.GET

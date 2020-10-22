@@ -1,7 +1,5 @@
 package io.keepcoding.globaldisastertracker.repository.remote
 
-import EONETApi
-import io.keepcoding.globaldisastertracker.domain.EONETResponse
 import io.keepcoding.globaldisastertracker.utils.ApiKey
 
 
