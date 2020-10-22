@@ -12,6 +12,7 @@ import io.keepcoding.globaldisastertracker.repository.remote.ApiHelper
 import io.keepcoding.globaldisastertracker.ui.main.EventItemViewModel
 import io.keepcoding.globaldisastertracker.utils.Resource
 import kotlinx.coroutines.launch
+import java.util.*
 
 class DetailFragmentViewModel(private val context : Application, private val apiHelper: ApiHelper, private val localHelper: LocalHelper) : ViewModel() {
 
@@ -126,14 +127,12 @@ class DetailFragmentViewModel(private val context : Application, private val api
     fun saveEvent(eventViewModel: EventItemViewModel){
         viewModelScope.launch{
             try{
-                val event = DisasterEvent(title = eventViewModel.title,
-                    description = eventViewModel.description as String?
-                    )
+                val id = UUID.randomUUID().toString()
                 // Next we turn the api responses into room entities
                 val imageEntities = images.value?.data?.map {
                     it?.let {
                         it.image?.let {url ->
-                            DisasterImage(url=url)
+                            DisasterImage(eventId = id, url=url)
                         }
                     }
                 }
@@ -143,15 +142,15 @@ class DetailFragmentViewModel(private val context : Application, private val api
                             newsItem.newsUrl.let {url ->
                                 newsItem.description?.let{description ->
                                     newsItem.thumbnail?.let {contentUrl ->
-                                        DisasterNews(title = name, url = url, description = description, thumbnail = contentUrl)
+                                        DisasterNews(title = name, eventId = id, url = url, description = description, thumbnail = contentUrl)
                                     }
                                 }
                             }
                         }
                     }
                 }
-                val eventWithRelations = DisasterWithImagesAndNews(event, imageEntities, newsEntities)
-                localHelper.saveEvent(eventWithRelations)
+                val event = DisasterEvent(id= id, title = eventViewModel.title, description = eventViewModel.description, news = newsEntities, images = imageEntities)
+                localHelper.saveEvent(event)
                 toast.postValue(Resource.success("Event saved"))
             } catch (e: Exception){
                 toast.postValue(Resource.error(e.localizedMessage, "Could not save disaster, try again"))

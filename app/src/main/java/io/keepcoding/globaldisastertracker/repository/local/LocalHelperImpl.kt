@@ -19,5 +19,4 @@ class LocalHelperImpl(private val appDatabase: DisasterEventsRoomDatabase) : Loc
         appDatabase.disasterEventsDao().deleteEventWithImagesAndNews(event)
     }
 
-
 }

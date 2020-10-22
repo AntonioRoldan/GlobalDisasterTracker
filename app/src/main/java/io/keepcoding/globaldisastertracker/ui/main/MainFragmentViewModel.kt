@@ -45,9 +45,9 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
             try {
                 val eventsFromLocal = localHelper.getEvents()
                 val eventsViewModels: List<EventItemViewModel?> = eventsFromLocal.map {
-                    EventItemViewModel(id = it.DisasterEventEntity.id,
-                        title = it.DisasterEventEntity.title,
-                        description = it.DisasterEventEntity.description)
+                    EventItemViewModel(id = it.id,
+                        title = it.title,
+                        description = it.description)
                 }
                 events.postValue(Resource.success(eventsViewModels))
             } catch (e: Exception){

@@ -10,9 +10,9 @@ import java.util.*
 data class DisasterEvent(
     @PrimaryKey val id: String = UUID.randomUUID().toString(),
     @Ignore
-    var news: List<DisasterNews>,
+    var news: List<DisasterNews?>?,
     @Ignore
-    var images: List<DisasterImage>,
+    var images: List<DisasterImage?>?,
     val title: String?,
     val description: String?
 )
