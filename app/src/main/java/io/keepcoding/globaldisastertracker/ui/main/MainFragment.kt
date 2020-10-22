@@ -2,6 +2,7 @@ package io.keepcoding.globaldisastertracker.ui.main
 
 import android.content.Context
 import android.content.Intent
+import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -22,6 +23,7 @@ import io.keepcoding.globaldisastertracker.repository.remote.RemoteDataManager
 import io.keepcoding.globaldisastertracker.utils.CustomViewModelFactory
 import io.keepcoding.globaldisastertracker.utils.Status
 import kotlinx.android.synthetic.main.fragment_main.*
+import kotlinx.android.synthetic.main.try_again.*
 import kotlin.IllegalArgumentException
 
 private const val ARG_FROM_SERVER = "FROM_SERVER"
@@ -92,7 +94,16 @@ class MainFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setUpUI()
+        setUpListeners()
         setUpObservers()
+    }
+
+    private fun setUpListeners(){
+        buttonRetry.setOnClickListener {
+            retry.visibility = View.INVISIBLE
+            list.visibility = View.VISIBLE
+            fetchData()
+        }
     }
 
     private fun setUpUI(){
@@ -102,17 +113,32 @@ class MainFragment : Fragment() {
         list.adapter = eventsAdapter
     }
 
-    private fun setUpObservers(){
+    private fun fetchData(){
         if(fromServer){
             viewModel.fetchApiEvents()
         } else{
             viewModel.fetchLocalEvents()
         }
+    }
+
+    private fun setUpObservers(){
+        fetchData()
         viewModel.getEvents().observe(viewLifecycleOwner, Observer {
             when(it.status){
-                Status.SUCCESS -> events = it.data
-                Status.LOADING -> {} // We make recycler view invisible and spinning wheel visible
-                Status.ERROR -> Toast.makeText(requireActivity().application, it.message, Toast.LENGTH_LONG)
+                Status.SUCCESS -> {
+                    events = it.data
+                    loadingView.visibility = View.INVISIBLE
+                    list.visibility = View.VISIBLE
+                }
+                Status.LOADING -> {
+                    loadingView.visibility = View.VISIBLE
+                    list.visibility = View.INVISIBLE
+                } // We make recycler view invisible and spinning wheel visible
+                Status.ERROR -> {
+                    retry.visibility = View.VISIBLE
+                    list.visibility = View.INVISIBLE
+                    Toast.makeText(requireActivity().application, it.message, Toast.LENGTH_LONG)
+                }
             }
         })
     }

@@ -10,10 +10,16 @@
     <include
         android:id="@+id/loadingView"
         layout="@layout/view_loading" />
+    <include
+        android:id="@+id/retry"
+        layout="@layout/try_again"
+        android:visibility="invisible"
+        />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="invisible"
         />
 
 </LinearLayout>
