@@ -27,10 +27,10 @@ abstract class DisasterEventsDao{
     abstract fun insertEvent(event: DisasterEvent)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertNewsList(news: List<DisasterNews>)
+    abstract fun insertNewsList(news: List<DisasterNews?>?)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertImagesList(images: List<DisasterImage>)
+    abstract fun insertImagesList(images: List<DisasterImage?>?)
 
     @Delete
     abstract fun deleteEvent(event: DisasterEvent)
@@ -42,13 +42,18 @@ abstract class DisasterEventsDao{
     abstract fun deleteNews(news: DisasterNews)
 
     fun insertEventWithImagesAndNews(event: DisasterEvent){
-        var images: List<DisasterImage> = event.images
-        var news: List<DisasterNews> = event.news
-        for(image in images){
-            image.eventId = event.id
+        var images: List<DisasterImage?>? = event.images
+        var news: List<DisasterNews?>? = event.news
+        images?.let {
+            for(image in it){
+
+                image?.eventId = event.id
+            }
         }
-        for(article in news){
-            article.eventId = event.id
+        news?.let {
+            for(article in it){
+                article?.eventId = event.id
+            }
         }
         insertImagesList(images)
         insertNewsList(news)
@@ -65,11 +70,19 @@ abstract class DisasterEventsDao{
     }
 
     fun deleteEventWithImagesAndNews(event: DisasterEvent){
-        for(image in event.images){
-            deleteImage(image)
+        event.images?.let {images ->
+            for(image in images){
+                image?.let {
+                    deleteImage(it)
+                }
+            }
         }
-        for(article in event.news){
-            deleteNews(article)
+        event.news?.let {articles ->
+            for(article in articles){
+                article?.let {
+                    deleteNews(it)
+                }
+            }
         }
         deleteEvent(event)
     }

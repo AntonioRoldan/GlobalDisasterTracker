@@ -7,7 +7,7 @@ import io.keepcoding.globaldisastertracker.domain.DisasterWithImagesAndNews
 
 class LocalHelperImpl(private val appDatabase: DisasterEventsRoomDatabase) : LocalHelper {
 
-    override suspend fun getEventById(id: String): DisasterEvent = appDatabase.disasterEventsDao().getEvent(id)
+    override suspend fun getEventById(id: String): DisasterEvent = appDatabase.disasterEventsDao().getEventWithImagesAndNews(id)
 
     override suspend fun getEvents(): List<DisasterEvent> = appDatabase.disasterEventsDao().getEvents()
 
@@ -15,8 +15,8 @@ class LocalHelperImpl(private val appDatabase: DisasterEventsRoomDatabase) : Loc
         appDatabase.disasterEventsDao().insertEventWithImagesAndNews(disasterEvent)
     }
 
-    override suspend fun deleteEvent(event: DisasterEvent) {
-        appDatabase.disasterEventsDao().deleteEventWithImagesAndNews(event)
+    override suspend fun deleteEvent(disasterEvent: DisasterEvent) {
+        appDatabase.disasterEventsDao().deleteEventWithImagesAndNews(disasterEvent)
     }
 
 }

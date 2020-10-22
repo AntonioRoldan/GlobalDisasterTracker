@@ -8,11 +8,11 @@ import java.util.*
 
 @Entity(tableName = "disaster_event_table")
 data class DisasterEvent(
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    @PrimaryKey var id: String = UUID.randomUUID().toString(),
     @Ignore
-    var news: List<DisasterNews?>?,
+    var news: List<DisasterNews?>? = mutableListOf(null),
     @Ignore
-    var images: List<DisasterImage?>?,
-    val title: String?,
-    val description: String?
+    var images: List<DisasterImage?>? = mutableListOf(null),
+    var title: String? = null,
+    var description: String? = null
 )

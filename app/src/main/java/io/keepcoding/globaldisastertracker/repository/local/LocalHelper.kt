@@ -11,8 +11,8 @@ interface LocalHelper {
 
     suspend fun getEvents(): List<DisasterEvent>
 
-    suspend fun saveEvent(event: DisasterEvent)
+    suspend fun saveEvent(disasterEvent: DisasterEvent)
 
-    suspend fun deleteEvent(event: DisasterEvent)
+    suspend fun deleteEvent(disasterEvent: DisasterEvent)
 
 }
