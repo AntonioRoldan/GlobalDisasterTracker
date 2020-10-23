@@ -28,13 +28,15 @@ class MainActivity : AppCompatActivity(), MainInteractionListener {
         }.attach()
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    /*override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == REQUEST_CODE){
+        /*if(requestCode == REQUEST_CODE){
              if(viewPagerAdapter.localFragmentIsInitialized())
                  viewPagerAdapter.localFragment.updateList()
         }
+        */
     }
+    */
 
     override fun onItemClickFromServer(eventItemViewModel: EventItemViewModel) {
         // If we are coming from the server events list we set FROM_SERVER to true

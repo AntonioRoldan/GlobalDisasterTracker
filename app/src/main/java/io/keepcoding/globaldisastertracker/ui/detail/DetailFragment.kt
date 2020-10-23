@@ -106,9 +106,7 @@ class DetailFragment : Fragment() {
             }
         } else {
             fab?.setOnClickListener {
-                eventItem.id?.let {id ->
-                    viewModel.deleteEvent(id)
-                }
+                viewModel.deleteEvent(eventItem.id!!)
             }
         }
     }
@@ -147,14 +145,16 @@ class DetailFragment : Fragment() {
             when (images.status) {
                 Status.SUCCESS -> {
                     imageItems = images.data
-                    loadingView.visibility = View.INVISIBLE
+                    loadingView.visibility = View.GONE
+                    retry.visibility = View.GONE
                     list.visibility = View.VISIBLE
                     list.adapter = detailsAdapter
                     viewModel.fetchApiNews(eventItem.title!!)
                 }
                 Status.LOADING -> {
-                    loadingView.visibility = View.GONE
-                    retry.visibility = View.GONE
+                    loadingView.visibility = View.VISIBLE
+                    retry.visibility = View.INVISIBLE
+                    list.visibility = View.INVISIBLE
                 }
                 Status.ERROR -> {
                     retry.visibility = View.VISIBLE
@@ -170,7 +170,8 @@ class DetailFragment : Fragment() {
             when (news.status) {
                 Status.SUCCESS -> {
                     newsItems = news.data
-                    loadingView.visibility = View.INVISIBLE
+                    loadingView.visibility = View.GONE
+                    retry.visibility = View.GONE
                     list.visibility = View.VISIBLE
                     list.adapter = detailsAdapter
                     viewModel.fetchApiImages(eventItem.title!!)

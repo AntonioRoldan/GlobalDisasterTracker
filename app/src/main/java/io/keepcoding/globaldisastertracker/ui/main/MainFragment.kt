@@ -80,6 +80,13 @@ class MainFragment : Fragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        if(!fromServer) {
+            updateList()
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -142,8 +149,7 @@ class MainFragment : Fragment() {
     }
 
     fun updateList(){
-        fetchData()
-        eventsAdapter.notifyDataSetChanged()
+        setUpObservers()
     }
 
     companion object {
