@@ -59,7 +59,7 @@ class MainFragment : Fragment() {
     private val viewModel: MainFragmentViewModel by lazy {
         val factory = CustomViewModelFactory(requireActivity().application,
             ApiHelperImpl(RemoteDataManager().bingSearchApi, RemoteDataManager().eonetApi),
-            LocalHelperImpl(DisasterEventsRoomDatabase.getInstance(requireActivity().applicationContext))
+            LocalHelperImpl(DisasterEventsRoomDatabase.getInstance(requireActivity()))
         )
         ViewModelProvider(this, factory).get(MainFragmentViewModel::class.java)
     }

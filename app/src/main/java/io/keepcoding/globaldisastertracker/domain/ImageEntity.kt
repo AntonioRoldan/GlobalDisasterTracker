@@ -7,7 +7,7 @@ import java.util.*
 
 @Entity(tableName = "disaster_image_table")
 data class DisasterImage(
-    @PrimaryKey val id: String = UUID.randomUUID().toString(),
+    @PrimaryKey var id: String = UUID.randomUUID().toString(),
     var eventId: String? = null,
     var url: String
 )

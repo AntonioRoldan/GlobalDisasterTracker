@@ -3,7 +3,6 @@ package io.keepcoding.globaldisastertracker.domain
 import androidx.room.Entity
 import androidx.room.Ignore
 import androidx.room.PrimaryKey
-import java.time.OffsetDateTime
 import java.util.*
 
 @Entity(tableName = "disaster_event_table")

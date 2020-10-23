@@ -1,9 +1,6 @@
 package io.keepcoding.globaldisastertracker.repository.local
 
 import io.keepcoding.globaldisastertracker.domain.DisasterEvent
-import io.keepcoding.globaldisastertracker.domain.DisasterImage
-import io.keepcoding.globaldisastertracker.domain.DisasterNews
-import io.keepcoding.globaldisastertracker.domain.DisasterWithImagesAndNews
 
 interface LocalHelper {
 

@@ -40,10 +40,21 @@ private const val ARG_IS_NEWS_FRAGMENT ="IS_NEWS_FRAGMENT"
  */
 class DetailFragment : Fragment() {
     // Fragment parameters
-    private var fromServer: Boolean = false
-    private var eventItem: EventItemViewModel? = null
+    private val fromServer: Boolean by lazy {
+        var server = false
+        arguments?.let {
+            server = it.getBoolean(ARG_FROM_SERVER)
+        }
+        server
+    }
+    private val eventItem: EventItemViewModel by lazy {
+        lateinit var eventViewModel: EventItemViewModel
+        arguments?.let {
+            eventViewModel = it.getParcelable(ARG_EVENT_ITEM)!!
+        }
+        eventViewModel
+    }
     private var isNewsFragment: Boolean = false
-    private var sharedFAB: FloatingActionButton? = null
 
     private var imageItems: List<ImageItemViewModel?>? = mutableListOf(null)
 
@@ -61,7 +72,7 @@ class DetailFragment : Fragment() {
     private val viewModel: DetailFragmentViewModel by lazy {
         val factory = CustomViewModelFactory(requireActivity().application,
             ApiHelperImpl(RemoteDataManager().bingSearchApi, RemoteDataManager().eonetApi),
-            LocalHelperImpl(DisasterEventsRoomDatabase.getInstance(requireActivity().applicationContext))
+            LocalHelperImpl(DisasterEventsRoomDatabase.getInstance(requireActivity()))
         )
         ViewModelProvider(this, factory).get(DetailFragmentViewModel::class.java)
     }
@@ -69,8 +80,6 @@ class DetailFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            fromServer = it.getBoolean(ARG_FROM_SERVER)
-            eventItem = it.getParcelable(ARG_EVENT_ITEM)
             isNewsFragment = it.getBoolean(ARG_IS_NEWS_FRAGMENT)
         }
     }
@@ -91,19 +100,14 @@ class DetailFragment : Fragment() {
     }
 
     fun setFABClickListener(fab: FloatingActionButton?){
-        sharedFAB = fab
         if(fromServer){
-            sharedFAB?.setOnClickListener {
-                eventItem?.let { eventItem ->
-                    viewModel.saveEvent(eventViewModel = eventItem)
-                }
+            fab?.setOnClickListener {
+                viewModel.saveEvent(eventViewModel = eventItem)
             }
         } else {
-            sharedFAB?.setOnClickListener {
-                eventItem?.let { eventItem ->
-                    eventItem.id?.let {id ->
-                        viewModel.deleteEvent(id)
-                    }
+            fab?.setOnClickListener {
+                eventItem.id?.let {id ->
+                    viewModel.deleteEvent(id)
                 }
             }
         }
@@ -111,9 +115,7 @@ class DetailFragment : Fragment() {
 
     private fun setUpListeners(){
         buttonRetry.setOnClickListener {
-            eventItem?.let {
-                fetchData(it)
-            }
+            fetchData(eventItem)
         }
     }
 
@@ -148,10 +150,11 @@ class DetailFragment : Fragment() {
                     loadingView.visibility = View.INVISIBLE
                     list.visibility = View.VISIBLE
                     list.adapter = detailsAdapter
+                    viewModel.fetchApiNews(eventItem.title!!)
                 }
                 Status.LOADING -> {
-                    loadingView.visibility = View.VISIBLE
-                    retry.visibility = View.INVISIBLE
+                    loadingView.visibility = View.GONE
+                    retry.visibility = View.GONE
                 }
                 Status.ERROR -> {
                     retry.visibility = View.VISIBLE
@@ -170,6 +173,7 @@ class DetailFragment : Fragment() {
                     loadingView.visibility = View.INVISIBLE
                     list.visibility = View.VISIBLE
                     list.adapter = detailsAdapter
+                    viewModel.fetchApiImages(eventItem.title!!)
                 }
                 Status.LOADING -> {
                     retry.visibility = View.INVISIBLE
@@ -185,20 +189,18 @@ class DetailFragment : Fragment() {
         })
     }
     private fun setUpObservers(){
-        eventItem?.let { event ->
-            fetchData(event)
-            if(isNewsFragment){
-                observeNews()
-            } else {
-                observeImages()
-            }
-            viewModel.getSnackBar().observe(viewLifecycleOwner, Observer { snackBar ->
-                when(snackBar.status) {
-                    Status.SUCCESS -> Toast.makeText(requireActivity().application, snackBar.data, Toast.LENGTH_LONG).show()
-                    else -> Toast.makeText(requireActivity().application, snackBar.message, Toast.LENGTH_LONG).show()
-                }
-            })
+        fetchData(eventItem)
+        if(isNewsFragment){
+            observeNews()
+        } else {
+            observeImages()
         }
+        viewModel.getSnackBar().observe(viewLifecycleOwner, Observer { snackBar ->
+            when(snackBar.status) {
+                Status.SUCCESS -> Toast.makeText(requireActivity().application, snackBar.data, Toast.LENGTH_LONG).show()
+                else -> Toast.makeText(requireActivity().application, snackBar.message, Toast.LENGTH_LONG).show()
+            }
+        })
     }
 
 

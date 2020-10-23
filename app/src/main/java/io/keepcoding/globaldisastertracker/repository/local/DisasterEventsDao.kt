@@ -1,12 +1,10 @@
 package io.keepcoding.globaldisastertracker.repository.local
 
 
-import androidx.lifecycle.LiveData
 import androidx.room.*
 import io.keepcoding.globaldisastertracker.domain.DisasterEvent
 import io.keepcoding.globaldisastertracker.domain.DisasterImage
 import io.keepcoding.globaldisastertracker.domain.DisasterNews
-import io.keepcoding.globaldisastertracker.domain.DisasterWithImagesAndNews
 
 @Dao
 abstract class DisasterEventsDao{
@@ -27,10 +25,10 @@ abstract class DisasterEventsDao{
     abstract fun insertEvent(event: DisasterEvent)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertNewsList(news: List<DisasterNews?>?)
+    abstract fun insertNews(news: DisasterNews)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract fun insertImagesList(images: List<DisasterImage?>?)
+    abstract fun insertImage(images: DisasterImage)
 
     @Delete
     abstract fun deleteEvent(event: DisasterEvent)
@@ -46,17 +44,20 @@ abstract class DisasterEventsDao{
         var news: List<DisasterNews?>? = event.news
         images?.let {
             for(image in it){
-
                 image?.eventId = event.id
+                image?.let {
+                    insertImage(image)
+                }
             }
         }
         news?.let {
             for(article in it){
                 article?.eventId = event.id
+                article?.let {
+                    insertNews(article)
+                }
             }
         }
-        insertImagesList(images)
-        insertNewsList(news)
         insertEvent(event)
     }
 

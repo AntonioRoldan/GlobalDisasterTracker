@@ -1,5 +1,6 @@
 package io.keepcoding.globaldisastertracker.ui.detail
 
+import android.util.Log
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.viewpager2.adapter.FragmentStateAdapter
@@ -34,12 +35,12 @@ class ViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activi
     override fun createFragment(position: Int): Fragment {
         return when(position){
             0 -> {
-                newsFragment = DetailFragment.newInstance(eventItem = eventItem!!, fromServer = fromServer!!, isNewsFragment = true)
+                newsFragment = DetailFragment.newInstance(fromServer = fromServer!!, eventItem = eventItem!!,  isNewsFragment = true)
                 newsFragment.setFABClickListener(fabButton)
                 newsFragment
             }
             else -> {
-                imagesFragment = DetailFragment.newInstance(eventItem = eventItem!!, fromServer = fromServer!!, isNewsFragment = false)
+                imagesFragment = DetailFragment.newInstance(fromServer = fromServer!!, eventItem = eventItem!!,  isNewsFragment = false)
                 imagesFragment.setFABClickListener(fabButton)
                 imagesFragment
             }
