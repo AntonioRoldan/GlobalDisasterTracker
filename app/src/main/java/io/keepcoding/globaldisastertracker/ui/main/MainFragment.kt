@@ -121,7 +121,7 @@ class MainFragment : Fragment() {
             when(it.status){
                 Status.SUCCESS -> {
                     events = it.data
-                    Log.v("EVENTS", "$events")
+                    if(!fromServer) Log.v("EVENTS", "$events")
                     loadingView.visibility = View.INVISIBLE
                     list.visibility = View.VISIBLE
                     list.adapter = eventsAdapter
@@ -142,6 +142,7 @@ class MainFragment : Fragment() {
     }
 
     fun updateList(){
+        fetchData()
         eventsAdapter.notifyDataSetChanged()
     }
 

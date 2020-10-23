@@ -12,11 +12,13 @@ import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity(), MainInteractionListener {
 
-    private var viewPagerAdapter: ViewPagerAdapter? = null
+    private val viewPagerAdapter: ViewPagerAdapter by lazy {
+        ViewPagerAdapter(this)
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        viewPagerAdapter = ViewPagerAdapter(this)
         viewPager.adapter = viewPagerAdapter
         TabLayoutMediator(tabLayout, viewPager) {tab, position ->
             when(position){
@@ -29,10 +31,8 @@ class MainActivity : AppCompatActivity(), MainInteractionListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_CODE){
-            viewPagerAdapter?.let {
-             if(it.localFragmentIsInitialized())
-                 it.localFragment.updateList()
-            }
+             if(viewPagerAdapter.localFragmentIsInitialized())
+                 viewPagerAdapter.localFragment.updateList()
         }
     }
 
