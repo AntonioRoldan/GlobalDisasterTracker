@@ -12,7 +12,6 @@
         android:layout_height="wrap_content">
         <LinearLayout
             android:orientation="vertical"
-            android:clipToPadding="true"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
             <ImageView
@@ -32,7 +31,8 @@
                     android:id="@+id/headline"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="25dp"
+                    android:textSize="25sp"
+                    android:textStyle="bold"
                     android:layout_marginStart="3dp"
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="3dp"
@@ -41,7 +41,7 @@
                     android:id="@+id/content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="20dp"
+                    android:textSize="20sp"
                     android:layout_marginStart="3dp"
                     android:layout_marginBottom="2dp"
                     android:layout_marginLeft="3dp"
