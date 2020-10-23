@@ -19,7 +19,6 @@ import java.lang.Exception
 
 class MainFragmentViewModel(private val context: Application, private val apiHelper: ApiHelper, private val localHelper: LocalHelper) : ViewModel(){
 
-    private val eventsLocal = MutableLiveData<Resource<List<DisasterWithImagesAndNews>>>()
     private val events = MutableLiveData<Resource<List<EventItemViewModel?>>>()
     // Get events from server
 
@@ -29,8 +28,7 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
             try{
                 apiHelper.getEvents().enqueue(object : Callback<EONETResponse> {
                     override fun onFailure(call: Call<EONETResponse>, t: Throwable) {
-                        Log.v("API ERROR", t.localizedMessage)
-                        events.postValue(Resource.error(t.localizedMessage, null))
+                        events.postValue(Resource.error(t.localizedMessage!!, null))
                     }
 
                     override fun onResponse(
@@ -38,7 +36,7 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
                         response: Response<EONETResponse>
                     ) {
                         response.body()?.let {EONETResponse ->
-                            val eventViewModels: List<EventItemViewModel?>? = EONETResponse?.events?.map {
+                            val eventViewModels: List<EventItemViewModel?>? = EONETResponse.events?.map {
                                 EventItemViewModel(
                                     title = it?.title,
                                     description = it?.description as String?
@@ -50,8 +48,7 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
 
                 })
             } catch (e: Exception){
-                Log.v("API ERROR", e.localizedMessage)
-                events.postValue(Resource.error(e.localizedMessage, null))
+                events.postValue(Resource.error(e.localizedMessage!!, null))
             }
         }
     }
@@ -70,7 +67,7 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
                 }
                 events.postValue(Resource.success(eventsViewModels))
             } catch (e: Exception){
-                events.postValue(Resource.error(e.localizedMessage, null))
+                events.postValue(Resource.error(e.localizedMessage!!, null))
             }
         }
     }

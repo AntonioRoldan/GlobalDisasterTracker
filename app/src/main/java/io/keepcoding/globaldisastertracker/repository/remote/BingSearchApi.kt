@@ -11,13 +11,13 @@ import retrofit2.http.Query
 
 interface BingSearchApi {
 
-    @GET("/images/search")  // planetary/apod?api_key=DEMO_KEY
+    @GET("images/search")
     @Headers("Content-Type: application/json",
         "Ocp-Apim-Subscription-Key: 64f88d4b875840e489f51c8885192e66"
     )
     fun getImages(@Query("q") q: String): Call<BingImageSearchResponse>
 
-    @GET("/news/search")  // planetary/apod?api_key=DEMO_KEY
+    @GET("news/search")
     @Headers("Content-Type: application/json",
         "Ocp-Apim-Subscription-Key: 64f88d4b875840e489f51c8885192e66"
     )

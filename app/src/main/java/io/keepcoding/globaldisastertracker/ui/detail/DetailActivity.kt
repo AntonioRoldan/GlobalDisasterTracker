@@ -1,6 +1,7 @@
 package io.keepcoding.globaldisastertracker.ui.detail
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import io.keepcoding.globaldisastertracker.R
@@ -28,7 +29,6 @@ class DetailActivity : AppCompatActivity(), DetailInteractionListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_detail)
-        setSupportActionBar(findViewById(R.id.toolbar))
         val bundle: Bundle? = intent.getBundleExtra("bundle")
         eventItem = bundle?.getParcelable(ARG_EVENT_ITEM)
         fromServer = bundle?.getBoolean(ARG_FROM_SERVER)
@@ -45,13 +45,11 @@ class DetailActivity : AppCompatActivity(), DetailInteractionListener {
 
     }
 
-
-
     override fun onImageItemClick(imageUrl: String) {
-        TODO("Not yet implemented")
+        Log.v("suup", "yo")
     }
 
     override fun onNewsItemClick(newsArticleUrl: String) {
-        TODO("Not yet implemented")
+        Log.v("suup", "yo")
     }
 }

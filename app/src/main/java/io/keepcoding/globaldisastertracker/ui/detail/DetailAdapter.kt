@@ -1,6 +1,7 @@
 package io.keepcoding.globaldisastertracker.ui.detail
 
 import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,17 +15,18 @@ import kotlinx.android.synthetic.main.news_recycler_view_item.view.*
 
 class DetailAdapter(val context: Context, itemClickListener: DetailInteractionListener? = null) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var newsList: List<NewsItemViewModel?>? = mutableListOf(null)
-    private var imagesList: List<ImageItemViewModel?>? = mutableListOf(null)
+    private var newsItems = mutableListOf<NewsItemViewModel?>()
+    private var imagesItems = mutableListOf<ImageItemViewModel?>()
     private var isNewsFragment: Boolean = false
+
     private var newsDetailInteractionListener: ((View) -> Unit)? = {
         if(it.tag is NewsItemViewModel){
-            itemClickListener?.onNewsItemClick((it.tag as NewsItemViewModel)?.newsUrl as String)
+            itemClickListener?.onNewsItemClick((it.tag as NewsItemViewModel).newsUrl as String)
         }
     }
     private var imagesDetailInteractionListener: ((View) ->Unit)? = {
         if(it.tag is ImageItemViewModel){
-            itemClickListener?.onImageItemClick((it.tag as ImageItemViewModel)?.image as String)
+            itemClickListener?.onImageItemClick((it.tag as ImageItemViewModel).image as String)
         }
     }
     companion object {
@@ -32,12 +34,19 @@ class DetailAdapter(val context: Context, itemClickListener: DetailInteractionLi
         const val IMAGE = 2
     }
 
-    fun setData(newsList: List<NewsItemViewModel?>?, imagesList: List<ImageItemViewModel?>?, isNewsFragment: Boolean){
-        this.isNewsFragment = isNewsFragment
-        if(isNewsFragment)
-            this.newsList = newsList
-        else
-            this.imagesList = imagesList
+    fun setData(newsList: List<NewsItemViewModel?>?, imagesList: List<ImageItemViewModel?>?, isNews: Boolean){
+        isNewsFragment = isNews
+        if(isNewsFragment) {
+            newsList?.let {
+                newsItems = it.toMutableList()
+            }
+        }
+        else{
+            imagesList?.let {
+                this.imagesItems = it.toMutableList()
+            }
+        }
+        notifyDataSetChanged()
     }
 
     inner class NewsViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -53,8 +62,8 @@ class DetailAdapter(val context: Context, itemClickListener: DetailInteractionLi
                                 .placeholder(R.drawable.ic_launcher_background)
 
                         }.into(itemView.news_image)
-                    itemView.title.text = it.title
-                    itemView.description.text = it.description
+                    itemView.headline.text = it.title
+                    itemView.content.text = it.description
                 }
             }
     }
@@ -85,27 +94,26 @@ class DetailAdapter(val context: Context, itemClickListener: DetailInteractionLi
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if(isNewsFragment){
-            val article = newsList?.get(position)
+            val article = newsItems.get(position)
             (holder as NewsViewHolder).article = article
             holder.itemView.setOnClickListener(newsDetailInteractionListener)
         } else {
-            val image = imagesList?.get(position)
+            val image = imagesItems.get(position)
             (holder as ImagesViewHolder).image = image
             holder.itemView.setOnClickListener(imagesDetailInteractionListener)
         }
     }
 
-    override fun getItemCount(): Int {
+    override fun getItemViewType(position: Int): Int {
         if(isNewsFragment){
-            newsList?.let { news ->
-                return news.size
-            }
-        } else {
-            imagesList?.let { images ->
-                return images.size
-            }
+            return newsItems.get(position)!!.viewType
         }
-        return 0
+        return imagesItems.get(position)!!.viewType
     }
 
+    override fun getItemCount(): Int {
+        return if(isNewsFragment){
+            newsItems.size
+        } else imagesItems.size
+    }
 }

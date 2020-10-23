@@ -1,6 +1,7 @@
 package io.keepcoding.globaldisastertracker.ui.detail
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -32,24 +33,29 @@ class DetailFragmentViewModel(private val context : Application, private val api
                     Callback<BingImageSearchResponse> {
 
                     override fun onFailure(call: Call<BingImageSearchResponse>, t: Throwable) {
-                        images.postValue(Resource.error(t.localizedMessage, null))
+                        images.postValue(Resource.error(t.localizedMessage!!, null))
                     }
 
                     override fun onResponse(
                         call: Call<BingImageSearchResponse>,
                         response: Response<BingImageSearchResponse>
                     ) {
-                        response.body()?.let {
-                            val imageViewModels: List<ImageItemViewModel?>? = it.value?.map { imageApi ->
-                                ImageItemViewModel(image = imageApi?.contentUrl)
+                        if(response.isSuccessful){
+                            response.body()?.let {
+                                val imageViewModels: List<ImageItemViewModel?>? = it.value?.map { imageApi ->
+                                    ImageItemViewModel(image = imageApi?.contentUrl)
+                                }
+                                images.postValue(Resource.success(imageViewModels))
                             }
-                            images.postValue(Resource.success(imageViewModels))
+                        } else {
+                            Log.v("API ERROR", response.message())
+                            images.postValue(Resource.error(response.message(), null))
                         }
                     }
 
                 })
             } catch(e: Exception){
-                images.postValue(Resource.error(e.localizedMessage, null))
+                images.postValue(Resource.error(e.localizedMessage!!, null))
             }
         }
     }
@@ -61,28 +67,32 @@ class DetailFragmentViewModel(private val context : Application, private val api
                 apiHelper.getNews(query).enqueue(object : Callback<BingNewsSearchResponse> {
 
                     override fun onFailure(call: Call<BingNewsSearchResponse>, t: Throwable) {
-                        news.postValue(Resource.error(t.localizedMessage, null))
+                        news.postValue(Resource.error(t.localizedMessage!!, null))
                     }
 
                     override fun onResponse(
                         call: Call<BingNewsSearchResponse>,
                         response: Response<BingNewsSearchResponse>
                     ) {
-                        response.body()?.let {
-                            val newsItemViewModels: List<NewsItemViewModel?>? = it.value?.map { articleApi ->
-                                NewsItemViewModel(title = articleApi?.name,
-                                    description = articleApi?.description,
-                                    newsUrl = articleApi?.url,
-                                    thumbnail = articleApi?.image?.thumbnail?.contentUrl
-                                )
+                        if(response.isSuccessful){
+                            response.body()?.let {
+                                val newsItemViewModels: List<NewsItemViewModel?>? = it.value?.map { articleApi ->
+                                    NewsItemViewModel(title = articleApi?.name,
+                                        description = articleApi?.description,
+                                        newsUrl = articleApi?.url,
+                                        thumbnail = articleApi?.image?.thumbnail?.contentUrl
+                                    )
+                                }
+                                news.postValue(Resource.success(newsItemViewModels))
                             }
-                            news.postValue(Resource.success(newsItemViewModels))
+                        } else {
+                            Log.v("API ERROR", response.message())
+                            news.postValue(Resource.error(response.message(), null))
                         }
                     }
-
                 })
             } catch (e: Exception){
-                news.postValue(Resource.error(e.localizedMessage, null))
+                news.postValue(Resource.error(e.localizedMessage!!, null))
             }
         }
     }
@@ -110,7 +120,7 @@ class DetailFragmentViewModel(private val context : Application, private val api
                 }
                 news.postValue(Resource.success(newsViewModels))
             } catch (e: Exception){
-                news.postValue(Resource.error(e.localizedMessage, null))
+                news.postValue(Resource.error(e.localizedMessage!!, null))
             }
         }
     }
@@ -128,7 +138,7 @@ class DetailFragmentViewModel(private val context : Application, private val api
                 }
                 images.postValue(Resource.success(imageViewModels))
             } catch (e: Exception){
-                images.postValue(Resource.error(e.localizedMessage, null))
+                images.postValue(Resource.error(e.localizedMessage!!, null))
             }
         }
     }
@@ -146,7 +156,7 @@ class DetailFragmentViewModel(private val context : Application, private val api
                 news.postValue(Resource.success(null))
                 toast.postValue(Resource.success("Event deleted"))
             } catch (e: Exception){
-                toast.postValue(Resource.error(e.localizedMessage, "Error while deleting event, try again"))
+                toast.postValue(Resource.error(e.localizedMessage!!, "Error while deleting event, try again"))
             }
         }
     }
@@ -180,7 +190,7 @@ class DetailFragmentViewModel(private val context : Application, private val api
                 localHelper.saveEvent(event)
                 toast.postValue(Resource.success("Event saved"))
             } catch (e: Exception){
-                toast.postValue(Resource.error(e.localizedMessage, "Could not save disaster, try again"))
+                toast.postValue(Resource.error(e.localizedMessage!!, "Could not save disaster, try again"))
             }
         }
     }

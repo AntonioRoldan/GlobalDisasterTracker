@@ -28,7 +28,10 @@ class MainActivity : AppCompatActivity(), MainInteractionListener {
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == REQUEST_CODE){
-            viewPagerAdapter?.localFragment?.updateList()
+            viewPagerAdapter?.let {
+             if(it.localFragmentIsInitialized())
+                 it.localFragment.updateList()
+            }
         }
     }
 

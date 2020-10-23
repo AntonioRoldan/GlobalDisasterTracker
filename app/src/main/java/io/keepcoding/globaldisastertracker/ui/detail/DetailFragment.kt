@@ -1,6 +1,7 @@
 package io.keepcoding.globaldisastertracker.ui.detail
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -8,6 +9,9 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.DividerItemDecoration
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.keepcoding.globaldisastertracker.R
 import io.keepcoding.globaldisastertracker.repository.local.DisasterEventsRoomDatabase
@@ -17,8 +21,10 @@ import io.keepcoding.globaldisastertracker.repository.remote.RemoteDataManager
 import io.keepcoding.globaldisastertracker.ui.main.EventItemViewModel
 import io.keepcoding.globaldisastertracker.utils.CustomViewModelFactory
 import io.keepcoding.globaldisastertracker.utils.Status
-import kotlinx.android.synthetic.main.activity_detail.*
-import kotlinx.android.synthetic.main.fragment_detail.*
+import kotlinx.android.synthetic.main.fragment_detail.list
+import kotlinx.android.synthetic.main.fragment_detail.loadingView
+import kotlinx.android.synthetic.main.fragment_detail.retry
+import kotlinx.android.synthetic.main.try_again.*
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -37,12 +43,20 @@ class DetailFragment : Fragment() {
     private var fromServer: Boolean = false
     private var eventItem: EventItemViewModel? = null
     private var isNewsFragment: Boolean = false
+    private var sharedFAB: FloatingActionButton? = null
 
     private var imageItems: List<ImageItemViewModel?>? = mutableListOf(null)
 
     private var newsItems: List<NewsItemViewModel?>? = mutableListOf(null)
 
-    private var loading: Boolean = false
+    private val detailsAdapter: DetailAdapter by lazy {
+        lateinit var adapter: DetailAdapter
+        context?.let { context ->
+            adapter = DetailAdapter(context, requireActivity() as DetailActivity)
+        }
+        adapter.setData(newsItems, imageItems, isNewsFragment)
+        adapter
+    }
 
     private val viewModel: DetailFragmentViewModel by lazy {
         val factory = CustomViewModelFactory(requireActivity().application,
@@ -71,74 +85,117 @@ class DetailFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        setUpObservers()
         setUpListeners()
+        setUpRecyclerView()
+        setUpObservers()
     }
 
     fun setFABClickListener(fab: FloatingActionButton?){
+        sharedFAB = fab
         if(fromServer){
-            fab?.setOnClickListener {
+            sharedFAB?.setOnClickListener {
                 eventItem?.let { eventItem ->
                     viewModel.saveEvent(eventViewModel = eventItem)
                 }
             }
         } else {
-            fab?.setOnClickListener {
+            sharedFAB?.setOnClickListener {
                 eventItem?.let { eventItem ->
-                    viewModel.deleteEvent(eventItem.id!!)
+                    eventItem.id?.let {id ->
+                        viewModel.deleteEvent(id)
+                    }
                 }
             }
         }
     }
 
-    private fun setUpRecyclerViewAdapter(){
-        if(isNewsFragment){ // Display linear layout with news
-
-        } else { // Display grid layout with images
-
-        }
-    }
     private fun setUpListeners(){
-        fab.setOnClickListener { view ->
-            if(fromServer){
-                eventItem?.let {  viewModel.saveEvent(it) }
-            } else {
-                eventItem?.id?.let { eventId -> viewModel.deleteEvent(eventId) }
+        buttonRetry.setOnClickListener {
+            eventItem?.let {
+                fetchData(it)
             }
         }
     }
 
+    private fun setUpRecyclerView(){
+        if(isNewsFragment){ // Display linear layout with news
+            list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        } else { // Display grid layout with images
+            list.layoutManager = GridLayoutManager(context, 3)
+        }
+        list.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+    }
+
+    private fun fetchData(event: EventItemViewModel){
+        if(fromServer){
+            event.title?.let { title ->
+                if(isNewsFragment) viewModel.fetchApiNews(title)
+                else viewModel.fetchApiImages(title)
+            }
+        } else {
+            event.id?.let {id ->
+                if(isNewsFragment) viewModel.loadNewsFromLocal(id)
+                else viewModel.loadImagesFromLocal(id)
+            }
+        }
+    }
+
+    private fun observeImages(){
+        viewModel.getImages().observe(viewLifecycleOwner, Observer { images ->
+            when (images.status) {
+                Status.SUCCESS -> {
+                    imageItems = images.data
+                    loadingView.visibility = View.INVISIBLE
+                    list.visibility = View.VISIBLE
+                    list.adapter = detailsAdapter
+                }
+                Status.LOADING -> {
+                    loadingView.visibility = View.VISIBLE
+                    retry.visibility = View.INVISIBLE
+                }
+                Status.ERROR -> {
+                    retry.visibility = View.VISIBLE
+                    loadingView.visibility = View.INVISIBLE
+                    list.visibility = View.INVISIBLE
+                }
+            }
+        })
+    }
+
+    private fun observeNews(){
+        viewModel.getNews().observe(viewLifecycleOwner, Observer { news ->
+            when (news.status) {
+                Status.SUCCESS -> {
+                    newsItems = news.data
+                    loadingView.visibility = View.INVISIBLE
+                    list.visibility = View.VISIBLE
+                    list.adapter = detailsAdapter
+                }
+                Status.LOADING -> {
+                    retry.visibility = View.INVISIBLE
+                    loadingView.visibility = View.VISIBLE
+                    list.visibility = View.INVISIBLE
+                }
+                Status.ERROR -> {
+                    retry.visibility = View.VISIBLE
+                    loadingView.visibility = View.INVISIBLE
+                    list.visibility = View.INVISIBLE
+                }
+            }
+        })
+    }
     private fun setUpObservers(){
         eventItem?.let { event ->
-            if(fromServer){
-                event.title?.let { title ->
-                    viewModel.fetchApiNews(title)
-                    viewModel.fetchApiImages(title)
-                }
+            fetchData(event)
+            if(isNewsFragment){
+                observeNews()
             } else {
-                event.id?.let {id ->
-                    viewModel.loadImagesFromLocal(id)
-                    viewModel.loadNewsFromLocal(id)
-                }
+                observeImages()
             }
-            viewModel.getImages().observe(viewLifecycleOwner, Observer { images ->
-                when (images.status) {
-                    Status.SUCCESS -> imageItems = images.data
-                    Status.LOADING -> loading = true
-                    Status.ERROR -> Toast.makeText(requireActivity().application, images.message, Toast.LENGTH_LONG).show()
-                }
-            })
-            viewModel.getNews().observe(viewLifecycleOwner, Observer { news ->
-                when (news.status) {
-                    Status.SUCCESS -> newsItems = news.data
-                    Status.LOADING -> loading = true
-                    Status.ERROR -> Toast.makeText(requireActivity().application, news.message, Toast.LENGTH_LONG).show()
-                }
-            })
             viewModel.getSnackBar().observe(viewLifecycleOwner, Observer { snackBar ->
                 when(snackBar.status) {
                     Status.SUCCESS -> Toast.makeText(requireActivity().application, snackBar.data, Toast.LENGTH_LONG).show()
-                    Status.ERROR -> Toast.makeText(requireActivity().application, snackBar.message, Toast.LENGTH_LONG).show()
+                    else -> Toast.makeText(requireActivity().application, snackBar.message, Toast.LENGTH_LONG).show()
                 }
             })
         }

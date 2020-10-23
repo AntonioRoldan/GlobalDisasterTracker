@@ -10,6 +10,7 @@ import io.keepcoding.globaldisastertracker.ui.main.MainFragmentViewModel
 
 import java.lang.IllegalArgumentException
 
+@Suppress("UNCHECKED_CAST")
 class CustomViewModelFactory(private val application: Application, private val apiHelper: ApiHelper, private val localHelper: LocalHelper) :
     ViewModelProvider.NewInstanceFactory() {
 

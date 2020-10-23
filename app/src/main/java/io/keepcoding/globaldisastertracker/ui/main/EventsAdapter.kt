@@ -20,6 +20,7 @@ class EventsAdapter(val context: Context, val itemClickListener: ((EventItemView
 
     }
     var eventItems: List<EventItemViewModel?>? = null
+
     inner class EventHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
         var eventItemViewModel: EventItemViewModel? = null
             set(value) {

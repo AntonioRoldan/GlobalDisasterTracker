@@ -1,19 +1,15 @@
 package io.keepcoding.globaldisastertracker.ui.main
 
 import android.content.Context
-import android.content.Intent
-import android.opengl.Visibility
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import io.keepcoding.globaldisastertracker.R
 import io.keepcoding.globaldisastertracker.repository.local.DisasterEventsRoomDatabase
@@ -132,6 +128,7 @@ class MainFragment : Fragment() {
                 }
                 Status.LOADING -> {
                     loadingView.visibility = View.VISIBLE
+                    retry.visibility = View.INVISIBLE
                     list.visibility = View.INVISIBLE
                 } // We make recycler view invisible and spinning wheel visible
                 Status.ERROR -> {

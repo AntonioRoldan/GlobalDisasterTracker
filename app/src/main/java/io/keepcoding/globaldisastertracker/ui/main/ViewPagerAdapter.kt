@@ -13,6 +13,10 @@ class ViewPagerAdapter(activity: FragmentActivity) : FragmentStateAdapter(activi
         return 2
     }
 
+    fun localFragmentIsInitialized(): Boolean {
+        return ::localFragment.isInitialized
+    }
+
     override fun createFragment(position: Int): Fragment {
         return when(position){
             0 -> {
