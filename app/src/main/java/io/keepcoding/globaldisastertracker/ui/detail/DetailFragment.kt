@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import io.keepcoding.globaldisastertracker.R
 import io.keepcoding.globaldisastertracker.repository.local.DisasterEventsRoomDatabase
 import io.keepcoding.globaldisastertracker.repository.local.LocalHelperImpl
@@ -72,6 +73,22 @@ class DetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setUpObservers()
         setUpListeners()
+    }
+
+    fun setFABClickListener(fab: FloatingActionButton?){
+        if(fromServer){
+            fab?.setOnClickListener {
+                eventItem?.let { eventItem ->
+                    viewModel.saveEvent(eventViewModel = eventItem)
+                }
+            }
+        } else {
+            fab?.setOnClickListener {
+                eventItem?.let { eventItem ->
+                    viewModel.deleteEvent(eventItem.id!!)
+                }
+            }
+        }
     }
 
     private fun setUpRecyclerViewAdapter(){

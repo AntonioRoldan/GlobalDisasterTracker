@@ -5,7 +5,8 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.tabs.TabLayoutMediator
 import io.keepcoding.globaldisastertracker.R
 import io.keepcoding.globaldisastertracker.ui.main.EventItemViewModel
-import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_detail.*
+
 
 class DetailActivity : AppCompatActivity(), DetailInteractionListener {
 
@@ -33,6 +34,7 @@ class DetailActivity : AppCompatActivity(), DetailInteractionListener {
         fromServer = bundle?.getBoolean(ARG_FROM_SERVER)
         viewPagerAdapter = ViewPagerAdapter(this)
         viewPagerAdapter.setFragmentArguments(eventItem, fromServer)
+        viewPagerAdapter.setFAB(fab)
         viewPager.adapter = viewPagerAdapter
         TabLayoutMediator(tabLayout, viewPager) {tab, position ->
             when(position){
