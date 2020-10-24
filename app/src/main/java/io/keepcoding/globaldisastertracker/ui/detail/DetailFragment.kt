@@ -60,14 +60,8 @@ class DetailFragment : Fragment() {
 
     private var newsItems: List<NewsItemViewModel?>? = mutableListOf(null)
 
-    private val detailsAdapter: DetailAdapter by lazy {
-        lateinit var adapter: DetailAdapter
-        context?.let { context ->
-            adapter = DetailAdapter(context, requireActivity() as DetailActivity)
-        }
-        adapter.setData(newsItems, imageItems, isNewsFragment)
-        adapter
-    }
+    private var detailsAdapter: DetailAdapter? = null
+
 
     private val viewModel: DetailFragmentViewModel by lazy {
         val factory = CustomViewModelFactory(requireActivity().application,
@@ -117,13 +111,20 @@ class DetailFragment : Fragment() {
         }
     }
 
+    private fun setAdapter(){
+        context?.let { context ->
+            detailsAdapter = DetailAdapter(context, requireActivity() as DetailActivity)
+            detailsAdapter?.setData(newsItems, imageItems, isNewsFragment)
+        }
+    }
+
     private fun setUpRecyclerView(){
         if(isNewsFragment){ // Display linear layout with news
             list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         } else { // Display grid layout with images
             list.layoutManager = GridLayoutManager(context, 3)
+            list.addItemDecoration(DividerItemDecoration(context, GridLayoutManager.VERTICAL))
         }
-        list.addItemDecoration(DividerItemDecoration(context, GridLayoutManager.VERTICAL))
     }
 
     private fun fetchData(event: EventItemViewModel){
@@ -148,6 +149,7 @@ class DetailFragment : Fragment() {
                     loadingView.visibility = View.GONE
                     retry.visibility = View.GONE
                     list.visibility = View.VISIBLE
+                    setAdapter()
                     list.adapter = detailsAdapter
                     viewModel.fetchApiNews(eventItem.title!!)
                 }
@@ -173,6 +175,7 @@ class DetailFragment : Fragment() {
                     loadingView.visibility = View.GONE
                     retry.visibility = View.GONE
                     list.visibility = View.VISIBLE
+                    setAdapter()
                     list.adapter = detailsAdapter
                     viewModel.fetchApiImages(eventItem.title!!) // We fetch the images too, in order to store them, if user has not switched to images tab
                 }

@@ -110,7 +110,6 @@ class MainFragment : Fragment() {
             when(it.status){
                 Status.SUCCESS -> {
                     events = it.data
-                    Log.v("shiiit", "$it.data")
                     if(!fromServer) Log.v("EVENTS", "$events")
                     loadingView.visibility = View.INVISIBLE
                     if(fromServer){
