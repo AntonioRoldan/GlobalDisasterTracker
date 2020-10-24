@@ -36,10 +36,13 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
                     ) {
                         response.body()?.let {EONETResponse ->
                             val eventViewModels: List<EventItemViewModel?>? = EONETResponse.events?.map {
-                                EventItemViewModel(
-                                    title = it?.title,
-                                    description = it?.description as String?
-                                )
+                                it?.link?.let { link ->
+                                    EventItemViewModel(
+                                        url = link,
+                                        title = it?.title,
+                                        description = it?.description as String?
+                                    )
+                                }
                             }
                             events.postValue(Resource.success(eventViewModels))
                         }
@@ -61,6 +64,7 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
                 val eventsFromLocal = localHelper.getEvents()
                 val eventsViewModels: List<EventItemViewModel?> = eventsFromLocal.map {
                     EventItemViewModel(id = it.id,
+                        url = it.url,
                         title = it.title,
                         description = it.description)
                 }

@@ -186,7 +186,7 @@ class DetailFragmentViewModel(private val context : Application, private val api
                         }
                     }
                 }
-                val event = DisasterEvent(id= id, title = eventViewModel.title, description = eventViewModel.description, news = newsEntities, images = imageEntities)
+                val event = DisasterEvent(url = eventViewModel.url, id= id, title = eventViewModel.title, description = eventViewModel.description, news = newsEntities, images = imageEntities)
                 localHelper.saveEvent(event)
                 toast.postValue(Resource.success("Event saved"))
             } catch (e: Exception){

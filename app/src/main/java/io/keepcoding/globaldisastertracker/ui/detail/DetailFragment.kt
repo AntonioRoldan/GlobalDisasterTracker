@@ -174,7 +174,7 @@ class DetailFragment : Fragment() {
                     retry.visibility = View.GONE
                     list.visibility = View.VISIBLE
                     list.adapter = detailsAdapter
-                    viewModel.fetchApiImages(eventItem.title!!)
+                    viewModel.fetchApiImages(eventItem.title!!) // We fetch the images too, in order to store them, if user has not switched to images tab
                 }
                 Status.LOADING -> {
                     retry.visibility = View.INVISIBLE

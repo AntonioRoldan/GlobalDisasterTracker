@@ -7,7 +7,8 @@ import java.util.*
 
 @Entity(tableName = "disaster_event_table")
 data class DisasterEvent(
-    @PrimaryKey var id: String = UUID.randomUUID().toString(),
+    @PrimaryKey var url: String = "",
+    var id: String = UUID.randomUUID().toString(),
     @Ignore
     var news: List<DisasterNews?>? = mutableListOf(null),
     @Ignore
