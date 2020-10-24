@@ -15,12 +15,12 @@ interface BingSearchApi {
     @Headers("Content-Type: application/json",
         "Ocp-Apim-Subscription-Key: 64f88d4b875840e489f51c8885192e66"
     )
-    fun getImages(@Query("q") q: String): Call<BingImageSearchResponse>
+    suspend fun getImages(@Query("q") q: String): BingImageSearchResponse
 
     @GET("news/search")
     @Headers("Content-Type: application/json",
         "Ocp-Apim-Subscription-Key: 64f88d4b875840e489f51c8885192e66"
     )
-    fun getNews(@Query("q") q: String): Call<BingNewsSearchResponse>
+    suspend fun getNews(@Query("q") q: String): BingNewsSearchResponse
 
 }

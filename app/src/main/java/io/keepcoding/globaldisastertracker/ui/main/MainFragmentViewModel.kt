@@ -1,19 +1,15 @@
 package io.keepcoding.globaldisastertracker.ui.main
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import io.keepcoding.globaldisastertracker.domain.EONETResponse
 import io.keepcoding.globaldisastertracker.repository.local.LocalHelper
 import io.keepcoding.globaldisastertracker.repository.remote.ApiHelper
 import io.keepcoding.globaldisastertracker.utils.Resource
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.lang.Exception
 
 class MainFragmentViewModel(private val context: Application, private val apiHelper: ApiHelper, private val localHelper: LocalHelper) : ViewModel(){
@@ -25,30 +21,17 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
         viewModelScope.launch {
             events.postValue(Resource.loading(null))
             try{
-                apiHelper.getEvents().enqueue(object : Callback<EONETResponse> {
-                    override fun onFailure(call: Call<EONETResponse>, t: Throwable) {
-                        events.postValue(Resource.error(t.localizedMessage!!, null))
+                val response = async {apiHelper.getEvents() }
+                val eventViewModels: List<EventItemViewModel?>? = response.await().events?.map {
+                    it?.link?.let { link ->
+                        EventItemViewModel(
+                            url = link,
+                            title = it.title,
+                            description = it.description as String?
+                        )
                     }
-
-                    override fun onResponse(
-                        call: Call<EONETResponse>,
-                        response: Response<EONETResponse>
-                    ) {
-                        response.body()?.let {EONETResponse ->
-                            val eventViewModels: List<EventItemViewModel?>? = EONETResponse.events?.map {
-                                it?.link?.let { link ->
-                                    EventItemViewModel(
-                                        url = link,
-                                        title = it?.title,
-                                        description = it?.description as String?
-                                    )
-                                }
-                            }
-                            events.postValue(Resource.success(eventViewModels))
-                        }
-                    }
-
-                })
+                }
+                events.postValue(Resource.success(eventViewModels))
             } catch (e: Exception){
                 events.postValue(Resource.error(e.localizedMessage!!, null))
             }
@@ -61,8 +44,8 @@ class MainFragmentViewModel(private val context: Application, private val apiHel
         viewModelScope.launch {
             events.postValue(Resource.loading(null))
             try {
-                val eventsFromLocal = localHelper.getEvents()
-                val eventsViewModels: List<EventItemViewModel?> = eventsFromLocal.map {
+                val eventsFromLocal = async { localHelper.getEvents() }
+                val eventsViewModels: List<EventItemViewModel?> = eventsFromLocal.await().map {
                     EventItemViewModel(id = it.id,
                         url = it.url,
                         title = it.title,

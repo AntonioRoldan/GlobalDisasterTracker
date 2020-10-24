@@ -6,9 +6,9 @@ import io.keepcoding.globaldisastertracker.domain.EONETResponse
 import retrofit2.Call
 
 interface ApiHelper {
-    suspend fun getImages(q: String): Call<BingImageSearchResponse>
+    suspend fun getImages(q: String): BingImageSearchResponse
 
-    suspend fun getNews(q: String): Call<BingNewsSearchResponse>
+    suspend fun getNews(q: String): BingNewsSearchResponse
 
-    suspend fun getEvents() : Call<EONETResponse>
+    suspend fun getEvents() : EONETResponse
 }

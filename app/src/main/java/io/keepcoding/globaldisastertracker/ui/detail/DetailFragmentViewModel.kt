@@ -1,21 +1,21 @@
 package io.keepcoding.globaldisastertracker.ui.detail
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-
-import io.keepcoding.globaldisastertracker.domain.*
+import io.keepcoding.globaldisastertracker.domain.DisasterEvent
+import io.keepcoding.globaldisastertracker.domain.DisasterImage
+import io.keepcoding.globaldisastertracker.domain.DisasterNews
 import io.keepcoding.globaldisastertracker.repository.local.LocalHelper
 import io.keepcoding.globaldisastertracker.repository.remote.ApiHelper
 import io.keepcoding.globaldisastertracker.ui.main.EventItemViewModel
 import io.keepcoding.globaldisastertracker.utils.Resource
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
+import kotlinx.coroutines.withContext
 import java.util.*
 
 class DetailFragmentViewModel(private val context : Application, private val apiHelper: ApiHelper, private val localHelper: LocalHelper) : ViewModel() {
@@ -29,31 +29,11 @@ class DetailFragmentViewModel(private val context : Application, private val api
         viewModelScope.launch {
             images.postValue(Resource.loading(null))
             try{
-                apiHelper.getImages(query).enqueue(object :
-                    Callback<BingImageSearchResponse> {
-
-                    override fun onFailure(call: Call<BingImageSearchResponse>, t: Throwable) {
-                        images.postValue(Resource.error(t.localizedMessage!!, null))
-                    }
-
-                    override fun onResponse(
-                        call: Call<BingImageSearchResponse>,
-                        response: Response<BingImageSearchResponse>
-                    ) {
-                        if(response.isSuccessful){
-                            response.body()?.let {
-                                val imageViewModels: List<ImageItemViewModel?>? = it.value?.map { imageApi ->
-                                    ImageItemViewModel(image = imageApi?.contentUrl)
-                                }
-                                images.postValue(Resource.success(imageViewModels))
-                            }
-                        } else {
-                            Log.v("API ERROR", response.message())
-                            images.postValue(Resource.error(response.message(), null))
-                        }
-                    }
-
-                })
+                val response = async { apiHelper.getImages(query) }
+                val imageViewModels: List<ImageItemViewModel?>? = response.await().value?.map { imageApi ->
+                    ImageItemViewModel(image = imageApi?.contentUrl)
+                }
+                images.postValue(Resource.success(imageViewModels))
             } catch(e: Exception){
                 images.postValue(Resource.error(e.localizedMessage!!, null))
             }
@@ -64,33 +44,16 @@ class DetailFragmentViewModel(private val context : Application, private val api
         viewModelScope.launch {
             news.postValue(Resource.loading(null))
             try {
-                apiHelper.getNews(query).enqueue(object : Callback<BingNewsSearchResponse> {
+                val response = async { apiHelper.getNews(query) }
+                val newsItemViewModels: List<NewsItemViewModel?>? = response.await().value?.map { articleApi ->
+                    NewsItemViewModel(title = articleApi?.name,
+                        description = articleApi?.description,
+                        newsUrl = articleApi?.url,
+                        thumbnail = articleApi?.image?.thumbnail?.contentUrl
+                    )
+                }
+                news.postValue(Resource.success(newsItemViewModels))
 
-                    override fun onFailure(call: Call<BingNewsSearchResponse>, t: Throwable) {
-                        news.postValue(Resource.error(t.localizedMessage!!, null))
-                    }
-
-                    override fun onResponse(
-                        call: Call<BingNewsSearchResponse>,
-                        response: Response<BingNewsSearchResponse>
-                    ) {
-                        if(response.isSuccessful){
-                            response.body()?.let {
-                                val newsItemViewModels: List<NewsItemViewModel?>? = it.value?.map { articleApi ->
-                                    NewsItemViewModel(title = articleApi?.name,
-                                        description = articleApi?.description,
-                                        newsUrl = articleApi?.url,
-                                        thumbnail = articleApi?.image?.thumbnail?.contentUrl
-                                    )
-                                }
-                                news.postValue(Resource.success(newsItemViewModels))
-                            }
-                        } else {
-                            Log.v("API ERROR", response.message())
-                            news.postValue(Resource.error(response.message(), null))
-                        }
-                    }
-                })
             } catch (e: Exception){
                 news.postValue(Resource.error(e.localizedMessage!!, null))
             }
@@ -111,8 +74,8 @@ class DetailFragmentViewModel(private val context : Application, private val api
         viewModelScope.launch {
             news.postValue(Resource.loading(null))
             try{
-                val event = localHelper.getEventById(id)
-                val localNews = event.news
+                val event = async { localHelper.getEventById(id) }
+                val localNews = event.await().news
                 val newsViewModels: List<NewsItemViewModel?>? = localNews?.map {
                     it?.let {
                         NewsItemViewModel(title = it.title, thumbnail = it.thumbnail, description = it.description, newsUrl = it.url)
@@ -129,8 +92,8 @@ class DetailFragmentViewModel(private val context : Application, private val api
         viewModelScope.launch {
             images.postValue(Resource.loading(null))
             try{
-                val event = localHelper.getEventById(id)
-                val localImages = event.images
+                val event = async { localHelper.getEventById(id) }
+                val localImages = event.await().images
                 val imageViewModels: List<ImageItemViewModel?>? = localImages?.map {
                     it?.let {
                         ImageItemViewModel(image = it.url)
@@ -150,8 +113,8 @@ class DetailFragmentViewModel(private val context : Application, private val api
     fun deleteEvent(id: String){
         viewModelScope.launch {
             try{
-                val event = localHelper.getEventById(id)
-                localHelper.deleteEvent(event)
+                val event = async { localHelper.getEventById(id) }
+                localHelper.deleteEvent(event.await())
                 images.postValue(Resource.success(null))
                 news.postValue(Resource.success(null))
                 toast.postValue(Resource.success("Event deleted"))
@@ -187,7 +150,8 @@ class DetailFragmentViewModel(private val context : Application, private val api
                     }
                 }
                 val event = DisasterEvent(url = eventViewModel.url, id= id, title = eventViewModel.title, description = eventViewModel.description, news = newsEntities, images = imageEntities)
-                localHelper.saveEvent(event)
+                var saveEventOperation = async { localHelper.saveEvent(event)  }
+                saveEventOperation.await()
                 toast.postValue(Resource.success("Event saved"))
             } catch (e: Exception){
                 toast.postValue(Resource.error(e.localizedMessage!!, "Could not save disaster, try again"))
