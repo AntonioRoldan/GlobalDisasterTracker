@@ -15,8 +15,8 @@ import kotlinx.android.synthetic.main.news_recycler_view_item.view.*
 
 class DetailAdapter(val context: Context, itemClickListener: DetailInteractionListener? = null) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var newsItems = mutableListOf<NewsItemViewModel?>()
-    private var imagesItems = mutableListOf<ImageItemViewModel?>()
+    private var newsItems = listOf<NewsItemViewModel?>()
+    private var imagesItems = listOf<ImageItemViewModel?>()
     private var isNewsFragment: Boolean = false
 
     private var newsDetailInteractionListener: ((View) -> Unit)? = {
@@ -38,12 +38,12 @@ class DetailAdapter(val context: Context, itemClickListener: DetailInteractionLi
         isNewsFragment = isNews
         if(isNewsFragment) {
             newsList?.let {
-                newsItems = it.toMutableList()
+                newsItems = it
             }
         }
         else{
             imagesList?.let {
-                this.imagesItems = it.toMutableList()
+                this.imagesItems = it
             }
         }
         notifyDataSetChanged()
@@ -86,7 +86,7 @@ class DetailAdapter(val context: Context, itemClickListener: DetailInteractionLi
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        if(viewType == NEWS){
+        if(isNewsFragment){
             return NewsViewHolder(LayoutInflater.from(context).inflate(R.layout.news_recycler_view_item, parent, false))
         }
         return ImagesViewHolder(LayoutInflater.from(context).inflate(R.layout.images_recycler_view_item, parent, false))
@@ -94,21 +94,14 @@ class DetailAdapter(val context: Context, itemClickListener: DetailInteractionLi
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         if(isNewsFragment){
-            val article = newsItems.get(position)
+            val article = newsItems[position]
             (holder as NewsViewHolder).article = article
             holder.itemView.setOnClickListener(newsDetailInteractionListener)
         } else {
-            val image = imagesItems.get(position)
+            val image = imagesItems[position]
             (holder as ImagesViewHolder).image = image
             holder.itemView.setOnClickListener(imagesDetailInteractionListener)
         }
-    }
-
-    override fun getItemViewType(position: Int): Int {
-        if(isNewsFragment){
-            return newsItems.get(position)!!.viewType
-        }
-        return imagesItems.get(position)!!.viewType
     }
 
     override fun getItemCount(): Int {

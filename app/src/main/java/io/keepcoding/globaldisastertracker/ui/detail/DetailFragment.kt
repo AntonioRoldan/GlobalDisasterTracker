@@ -123,7 +123,7 @@ class DetailFragment : Fragment() {
         } else { // Display grid layout with images
             list.layoutManager = GridLayoutManager(context, 3)
         }
-        list.addItemDecoration(DividerItemDecoration(context, DividerItemDecoration.VERTICAL))
+        list.addItemDecoration(DividerItemDecoration(context, GridLayoutManager.VERTICAL))
     }
 
     private fun fetchData(event: EventItemViewModel){
