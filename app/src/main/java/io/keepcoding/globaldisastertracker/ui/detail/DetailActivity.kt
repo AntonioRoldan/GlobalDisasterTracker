@@ -3,6 +3,7 @@ package io.keepcoding.globaldisastertracker.ui.detail
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentStatePagerAdapter.BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT
 import com.google.android.material.tabs.TabLayoutMediator
 import io.keepcoding.globaldisastertracker.R
 import io.keepcoding.globaldisastertracker.ui.main.EventItemViewModel

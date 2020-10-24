@@ -37,24 +37,7 @@ class MainFragment : Fragment() {
 
     private var mainInteractionListener: MainInteractionListener? = null // We will pass this to the recycler view adapter
 
-    private val eventsAdapter: EventsAdapter by lazy {
-        lateinit var adapter: EventsAdapter
-        if(fromServer){
-            context?.let { context ->
-                adapter = EventsAdapter(context) {
-                    mainInteractionListener?.onItemClickFromServer(it)
-                }
-            }
-        } else {
-            context?.let { context ->
-                adapter = EventsAdapter(context) {
-                    mainInteractionListener?.onItemClickFromLocal(it)
-                }
-            }
-        }
-        adapter.eventItems = events
-        adapter
-    }
+    private var eventsAdapter: EventsAdapter? = null
 
     private val viewModel: MainFragmentViewModel by lazy {
         val factory = CustomViewModelFactory(requireActivity().application,
@@ -83,7 +66,6 @@ class MainFragment : Fragment() {
     override fun onResume() {
         super.onResume()
         if(!fromServer) {
-            updateList()
         }
     }
 
@@ -128,8 +110,23 @@ class MainFragment : Fragment() {
             when(it.status){
                 Status.SUCCESS -> {
                     events = it.data
+                    Log.v("shiiit", "$it.data")
                     if(!fromServer) Log.v("EVENTS", "$events")
                     loadingView.visibility = View.INVISIBLE
+                    if(fromServer){
+                        context?.let { context ->
+                            eventsAdapter = EventsAdapter(context) {
+                                mainInteractionListener?.onItemClickFromServer(it)
+                            }
+                        }
+                    } else {
+                        context?.let { context ->
+                            eventsAdapter = EventsAdapter(context) {
+                                mainInteractionListener?.onItemClickFromLocal(it)
+                            }
+                        }
+                    }
+                    eventsAdapter?.eventItems = events
                     list.visibility = View.VISIBLE
                     list.adapter = eventsAdapter
                 }
