@@ -125,6 +125,7 @@ class DetailFragment : Fragment() {
             list.layoutManager = GridLayoutManager(context, 3)
             list.addItemDecoration(DividerItemDecoration(context, GridLayoutManager.VERTICAL))
         }
+        setAdapter()
     }
 
     private fun fetchData(event: EventItemViewModel){

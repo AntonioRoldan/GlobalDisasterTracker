@@ -94,6 +94,7 @@ class MainFragment : Fragment() {
 
     private fun setUpUI(){
         list.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        setAdapter()
     }
 
     private fun fetchData(){
@@ -101,6 +102,22 @@ class MainFragment : Fragment() {
             viewModel.fetchApiEvents()
         } else{
             viewModel.fetchLocalEvents()
+        }
+    }
+
+    private fun setAdapter(){
+        if(fromServer){
+            context?.let { context ->
+                eventsAdapter = EventsAdapter(context) {
+                    mainInteractionListener?.onItemClickFromServer(it)
+                }
+            }
+        } else {
+            context?.let { context ->
+                eventsAdapter = EventsAdapter(context) {
+                    mainInteractionListener?.onItemClickFromLocal(it)
+                }
+            }
         }
     }
 
@@ -112,19 +129,6 @@ class MainFragment : Fragment() {
                     events = it.data
                     if(!fromServer) Log.v("EVENTS", "$events")
                     loadingView.visibility = View.INVISIBLE
-                    if(fromServer){
-                        context?.let { context ->
-                            eventsAdapter = EventsAdapter(context) {
-                                mainInteractionListener?.onItemClickFromServer(it)
-                            }
-                        }
-                    } else {
-                        context?.let { context ->
-                            eventsAdapter = EventsAdapter(context) {
-                                mainInteractionListener?.onItemClickFromLocal(it)
-                            }
-                        }
-                    }
                     eventsAdapter?.eventItems = events
                     list.visibility = View.VISIBLE
                     list.adapter = eventsAdapter
